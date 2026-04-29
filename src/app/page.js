@@ -16,7 +16,11 @@ export default function Home() {
   useEffect(() => {
     fetch('/api/admin/products')
       .then(res => res.json())
-      .then(data => setProducts((data.products || []).slice(0, 3)))
+      .then(data => {
+        const allProducts = data.products || [];
+        const featuredProducts = allProducts.filter(p => p.featured);
+        setProducts(featuredProducts.length > 0 ? featuredProducts.slice(0, 3) : allProducts.slice(0, 3));
+      })
       .catch(() => {});
   }, []);
 

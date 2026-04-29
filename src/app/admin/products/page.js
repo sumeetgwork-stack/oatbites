@@ -11,7 +11,7 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', price: '', category: '', stock: 100, image: '' });
+  const [form, setForm] = useState({ name: '', description: '', price: '', category: '', stock: 100, image: '', featured: false });
 
   useEffect(() => {
     if (!isLoading && !isAdmin) router.push('/');
@@ -30,13 +30,13 @@ export default function AdminProductsPage() {
 
   const openAdd = () => {
     setEditProduct(null);
-    setForm({ name: '', description: '', price: '', category: '', stock: 100, image: '' });
+    setForm({ name: '', description: '', price: '', category: '', stock: 100, image: '', featured: false });
     setShowModal(true);
   };
 
   const openEdit = (p) => {
     setEditProduct(p);
-    setForm({ name: p.name, description: p.description, price: p.price, category: p.category, stock: p.stock, image: p.image || '' });
+    setForm({ name: p.name, description: p.description, price: p.price, category: p.category, stock: p.stock, image: p.image || '', featured: p.featured || false });
     setShowModal(true);
   };
 
@@ -53,7 +53,7 @@ export default function AdminProductsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...form, price: Number(form.price), stock: Number(form.stock) };
+    const payload = { ...form, price: Number(form.price), stock: Number(form.stock), featured: Boolean(form.featured) };
     
     if (editProduct) {
       await fetch('/api/admin/products', {
@@ -108,7 +108,10 @@ export default function AdminProductsPage() {
           <tbody>
             {products.map(p => (
               <tr key={p.id}>
-                <td><strong>{p.name}</strong></td>
+                <td>
+                  <strong>{p.name}</strong>
+                  {p.featured && <span style={{ color: '#f59e0b', marginLeft: '0.5rem', fontSize: '1.2rem' }} title="Featured on Homepage">★</span>}
+                </td>
                 <td>{p.category}</td>
                 <td>{p.stock}</td>
                 <td>₹{p.price.toLocaleString('en-IN')}</td>
@@ -161,6 +164,15 @@ export default function AdminProductsPage() {
                   {form.image && <img src={form.image} alt="Preview" style={{ height: '40px', borderRadius: '4px', marginTop: '0.5rem', objectFit: 'cover' }} />}
                 </label>
               </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', flexDirection: 'row', width: 'fit-content' }}>
+                <input 
+                  type="checkbox" 
+                  checked={form.featured} 
+                  onChange={e => setForm({...form, featured: e.target.checked})} 
+                  style={{ width: 'auto', marginBottom: 0 }}
+                />
+                Feature this product on the Homepage
+              </label>
               <div className="modal-actions">
                 <button type="button" className="btn-outline" onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit" className="btn-primary">{editProduct ? 'Save Changes' : 'Add Product'}</button>
