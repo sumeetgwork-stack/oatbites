@@ -11,7 +11,7 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', price: '', category: '', stock: 100 });
+  const [form, setForm] = useState({ name: '', description: '', price: '', category: '', stock: 100, image: '' });
 
   useEffect(() => {
     if (!isLoading && !isAdmin) router.push('/');
@@ -30,14 +30,25 @@ export default function AdminProductsPage() {
 
   const openAdd = () => {
     setEditProduct(null);
-    setForm({ name: '', description: '', price: '', category: '', stock: 100 });
+    setForm({ name: '', description: '', price: '', category: '', stock: 100, image: '' });
     setShowModal(true);
   };
 
   const openEdit = (p) => {
     setEditProduct(p);
-    setForm({ name: p.name, description: p.description, price: p.price, category: p.category, stock: p.stock });
+    setForm({ name: p.name, description: p.description, price: p.price, category: p.category, stock: p.stock, image: p.image || '' });
     setShowModal(true);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm(prev => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -139,10 +150,17 @@ export default function AdminProductsPage() {
                   </select>
                 </label>
               </div>
-              <label>
-                Stock
-                <input type="number" value={form.stock} onChange={e => setForm({...form, stock: e.target.value})} required min="0" />
-              </label>
+              <div className="form-row">
+                <label>
+                  Stock
+                  <input type="number" value={form.stock} onChange={e => setForm({...form, stock: e.target.value})} required min="0" />
+                </label>
+                <label>
+                  Product Image
+                  <input type="file" accept="image/*" onChange={handleImageUpload} style={{ border: 'none', padding: '0.5rem 0' }} />
+                  {form.image && <img src={form.image} alt="Preview" style={{ height: '40px', borderRadius: '4px', marginTop: '0.5rem', objectFit: 'cover' }} />}
+                </label>
+              </div>
               <div className="modal-actions">
                 <button type="button" className="btn-outline" onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit" className="btn-primary">{editProduct ? 'Save Changes' : 'Add Product'}</button>
