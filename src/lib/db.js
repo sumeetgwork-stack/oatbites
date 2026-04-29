@@ -68,6 +68,11 @@ export async function updateOrderStatus(orderId, status) {
 
 export async function updateOrderPayment(orderId, paymentData) {
   const orders = await getCollection('orders');
+  
+  // Find the order first to get the items
+  const order = await orders.findOne({ $or: [{ id: orderId }, { _id: orderId }] });
+  if (!order) return null;
+
   const update = {
     status: 'Paid',
     paidAt: new Date().toISOString(),
@@ -81,6 +86,18 @@ export async function updateOrderPayment(orderId, paymentData) {
     { $set: update },
     { returnDocument: 'after' }
   );
+
+  // Reduce stock for each item in the order
+  if (result && order.items && order.items.length > 0) {
+    const products = await getCollection('products');
+    for (const item of order.items) {
+      await products.updateOne(
+        { $or: [{ id: item.id }, { _id: item.id }] },
+        { $inc: { stock: -item.quantity } }
+      );
+    }
+  }
+
   return result;
 }
 
