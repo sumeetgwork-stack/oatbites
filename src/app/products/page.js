@@ -78,7 +78,7 @@ export default function ProductsPage() {
                     )}
                   </div>
                 </div>
-                <div className="flip-card-back" style={{ backgroundColor: product.color }}>
+                <div className="flip-card-back">
                   <div className="flip-card-back-content">
                     <h3>{product.name}</h3>
                     <p>{product.description || 'Premium organic oat product crafted with the finest ingredients for your health and taste.'}</p>
