@@ -1,0 +1,20 @@
+[
+  {
+    "id": "u-1777452009201",
+    "name": "Oatbites by sej",
+    "email": "oatbitesbysej@gmail.com",
+    "image": "https://lh3.googleusercontent.com/a/ACg8ocKF10gfbqMvdzmJ-1LzKCpEbOTVkqbDr3Th_Qnfz-Sn-4Iyig=s96-c",
+    "password": null,
+    "role": "admin",
+    "createdAt": "2026-04-29T08:40:09.201Z"
+  },
+  {
+    "id": "u-1777452189705",
+    "name": "SUMEET GUPTA",
+    "email": "202304017.sumeetsml@student.xavier.ac.in",
+    "image": "https://lh3.googleusercontent.com/a/ACg8ocLltg5TFUvOcFgvRi-9SWjlkFVeYKezYwRlBlQQLXB1fPCOhg=s96-c",
+    "password": null,
+    "role": "user",
+    "createdAt": "2026-04-29T08:43:09.706Z"
+  }
+]

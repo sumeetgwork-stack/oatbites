@@ -1,0 +1,56 @@
+[
+  {
+    "id": "p-01",
+    "name": "Classic Oatbites",
+    "description": "Our signature rolled oats blended with raw organic honey and a hint of vanilla. The perfect healthy snack for any time of the day.",
+    "price": 399,
+    "category": "Snacks",
+    "image": "/images/products/classic-oatbites.png",
+    "stock": 10
+  },
+  {
+    "id": "p-02",
+    "name": "Premium Oat Milk",
+    "description": "Rich, creamy, and dairy-free. Made from 100% organic whole grain oats. Perfect for your morning coffee or cereal.",
+    "price": 299,
+    "category": "Beverages",
+    "image": "/images/products/premium-oat-milk.png",
+    "stock": 100
+  },
+  {
+    "id": "p-03",
+    "name": "Dark Chocolate Oat Granola",
+    "description": "Crunchy oat clusters loaded with 70% dark chocolate chunks and roasted almonds. A decadent yet healthy breakfast.",
+    "price": 549,
+    "category": "Breakfast",
+    "image": "/images/products/chocolate-granola.png",
+    "stock": 100
+  },
+  {
+    "id": "p-04",
+    "name": "Berry Burst Overnight Oats",
+    "description": "A pre-mixed blend of chia seeds, dried mixed berries, and our premium oats. Just add milk and leave it overnight.",
+    "price": 399,
+    "category": "Breakfast",
+    "image": "/images/products/berry-overnight-oats.png",
+    "stock": 100
+  },
+  {
+    "id": "p-05",
+    "name": "Matcha Oat Energy Bars",
+    "description": "Fuel your day with these energy-packed bars made with Japanese ceremonial grade matcha, dates, and rolled oats.",
+    "price": 799,
+    "category": "Snacks",
+    "image": "/images/products/matcha-energy-bars.png",
+    "stock": 100
+  },
+  {
+    "id": "p-06",
+    "name": "Golden Turmeric Oat Cookies",
+    "description": "Soft-baked oat cookies infused with turmeric, ginger, and a dash of black pepper for an antioxidant boost.",
+    "price": 549,
+    "category": "Snacks",
+    "image": "/images/products/turmeric-cookies.png",
+    "stock": 100
+  }
+]

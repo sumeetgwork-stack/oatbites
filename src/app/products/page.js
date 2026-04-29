@@ -1,14 +1,11 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import { useCart } from '../../context/CartContext';
+import { useToast } from '../../components/Toast';
 import Link from 'next/link';
-import { useCart } from '../context/CartContext';
-import { useToast } from '../components/Toast';
 import { useEffect, useState } from 'react';
 
-const Scene = dynamic(() => import('../components/Scene'), { ssr: false });
-
-export default function Home() {
+export default function ProductsPage() {
   const { addToCart, cart, updateQuantity, removeFromCart } = useCart();
   const { addToast } = useToast();
   const [products, setProducts] = useState([]);
@@ -16,8 +13,12 @@ export default function Home() {
   useEffect(() => {
     fetch('/api/admin/products')
       .then(res => res.json())
-      .then(data => setProducts((data.products || []).slice(0, 3)))
-      .catch(() => {});
+      .then(data => setProducts(data.products || []))
+      .catch(() => {
+        import('../../lib/products').then(mod => {
+          setProducts(mod.products || []);
+        });
+      });
   }, []);
 
   const handleAddToCart = (product) => {
@@ -28,26 +29,19 @@ export default function Home() {
   const getCartItem = (id) => cart.find(item => item.id === id);
 
   return (
-    <main className="main-wrapper">
-      <div className="fixed-bg"><Scene /></div>
-      <div className="content-layer">
-        <section className="hero-section">
-          <div className="glass-panel hero-card">
-            <h1 className="hero-title">Healthy & <br/> Delicious.</h1>
-            <p className="hero-subtitle">
-              Experience the crunch. Premium oatbites crafted with love, care, and the finest organic ingredients.
-            </p>
-            <Link href="/products" className="btn-primary">Shop Now</Link>
-          </div>
-        </section>
+    <div className="page-container">
+      <div className="page-header">
+        <h1>All Products</h1>
+        <p>Discover our full range of premium oat-based goods.</p>
+      </div>
 
-        <section className="featured-section glass-panel">
-          <h2 className="section-title">Featured Oatbites</h2>
-          <div className="product-grid">
-            {products.map((product) => {
-              const cartItem = getCartItem(product.id);
-              return (
-                <div key={product.id} className="product-card">
+      <div className="product-grid page-grid">
+        {products.map((product) => {
+          const cartItem = getCartItem(product.id);
+          return (
+            <div key={product.id} className="product-card flip-card">
+              <div className="flip-card-inner">
+                <div className="flip-card-front">
                   <Link href={`/products/${product.id}`} className="product-image-link">
                     {product.image ? (
                       <img src={product.image} alt={product.name} className="product-image-placeholder" style={{ objectFit: 'cover' }} />
@@ -56,7 +50,10 @@ export default function Home() {
                     )}
                   </Link>
                   <div className="product-info">
-                    <Link href={`/products/${product.id}`}><h3>{product.name}</h3></Link>
+                    <Link href={`/products/${product.id}`} className="product-name-link">
+                      <h3>{product.name}</h3>
+                    </Link>
+                    <p className="category">{product.category}</p>
                     <p className="price">₹{product.price?.toLocaleString('en-IN')}</p>
                     {cartItem ? (
                       <div className="product-actions">
@@ -75,22 +72,30 @@ export default function Home() {
                         <span className="in-cart-label">In Cart</span>
                       </div>
                     ) : (
-                      <button className="btn-secondary" onClick={() => handleAddToCart(product)}>Add to Cart</button>
+                      <button className="btn-secondary" onClick={() => handleAddToCart(product)}>
+                        Add to Cart
+                      </button>
                     )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-          <div className="view-all-container">
-            <Link href="/products" className="btn-outline">View All Products</Link>
-          </div>
-        </section>
-
-        <footer className="footer">
-          <p>© 2026 Oatbites by SEJ. All rights reserved.</p>
-        </footer>
+                <div className="flip-card-back" style={{ backgroundColor: product.color }}>
+                  <div className="flip-card-back-content">
+                    <h3>{product.name}</h3>
+                    <p>{product.description || 'Premium organic oat product crafted with the finest ingredients for your health and taste.'}</p>
+                    {!cartItem ? (
+                      <button className="btn-primary" style={{ background: 'white', color: '#333' }} onClick={() => handleAddToCart(product)}>
+                        Add to Cart
+                      </button>
+                    ) : (
+                      <span className="in-cart-label" style={{ color: 'white', border: '1px solid white' }}>✓ In Cart ({cartItem.quantity})</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </main>
+    </div>
   );
 }

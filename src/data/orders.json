@@ -1,0 +1,27 @@
+[
+  {
+    "id": "ORD-1777452578330",
+    "userEmail": "202304017.sumeetsml@student.xavier.ac.in",
+    "userName": "SUMEET GUPTA",
+    "items": [
+      {
+        "id": "p-02",
+        "name": "Premium Oat Milk",
+        "price": 299,
+        "quantity": 1
+      }
+    ],
+    "total": 299,
+    "shippingAddress": {
+      "fullName": "Sumeet Gupta",
+      "phone": "+919876543210",
+      "street": "137/4746",
+      "city": "Mumbai",
+      "state": "maharashtra",
+      "pincode": "400089"
+    },
+    "razorpayOrderId": "order_SjFScojrnNiClu",
+    "status": "Pending",
+    "createdAt": "2026-04-29T08:49:38.330Z"
+  }
+]
