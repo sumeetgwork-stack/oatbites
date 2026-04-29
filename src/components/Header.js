@@ -15,7 +15,7 @@ export default function Header() {
         OATBITES <span style={{fontWeight: 300}}>BY SEJ</span>
       </Link>
       <nav className="nav-links">
-        <Link href="/products" className="nav-link">Shop All</Link>
+        <Link href="/about" className="nav-link">About Us</Link>
         
         {isLoggedIn && isAdmin && (
           <Link href="/admin" className="nav-link admin-link">Admin</Link>
