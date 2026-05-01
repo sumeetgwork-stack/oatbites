@@ -24,9 +24,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (isAdmin) {
-      fetch('/api/admin/stats')
+      // Added cache-busting timestamp to ensure fresh data
+      fetch('/api/admin/stats?t=' + Date.now())
         .then(res => res.json())
-        .then(data => setStats(data))
+        .then(data => {
+          console.log('Admin Stats Data:', data);
+          setStats(data);
+        })
         .catch(console.error);
     }
   }, [isAdmin]);
