@@ -166,14 +166,30 @@ export async function getAnalyticsStats() {
   ]).toArray();
   const uniqueVisitors = uniqueSessions.length > 0 ? uniqueSessions[0].total : 0;
   
-  // Get top 5 popular pages
-  const popularPages = await views.aggregate([
-    { $group: { _id: "$path", views: { $sum: 1 } } },
-    { $sort: { views: -1 } },
+  // Get views over last 7 days for the graph
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+  const dailyViews = await views.aggregate([
+    { $match: { timestamp: { $gte: sevenDaysAgo.toISOString() } } },
+    {
+      $project: {
+        date: { $substr: ["$timestamp", 5, 5] } // MM-DD
+      }
+    },
+    { $group: { _id: "$date", views: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]).toArray();
+
+  // Get unique visitors distribution by path for pie chart
+  const visitorDistribution = await views.aggregate([
+    { $group: { _id: "$path", uniqueSessions: { $addToSet: "$sessionId" } } },
+    { $project: { _id: 1, count: { $size: "$uniqueSessions" } } },
+    { $sort: { count: -1 } },
     { $limit: 5 }
   ]).toArray();
 
-  return { totalViews, uniqueVisitors, popularPages };
+  return { totalViews, uniqueVisitors, dailyViews, visitorDistribution };
 }
 
 // Legacy helpers (can be removed later)
