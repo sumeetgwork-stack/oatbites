@@ -135,8 +135,13 @@ a {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 2rem;
-  z-index: 100;
+  z-index: 999;
   border-radius: 50px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   animation: slideDown 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 

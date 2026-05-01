@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import { getAllOrders, getAllProducts, getAllUsers } from '@/lib/db';
+import { getAllOrders, getAllProducts, getAllUsers, getAnalyticsStats } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -8,10 +8,11 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const [orders, users, products] = await Promise.all([
+  const [orders, users, products, analytics] = await Promise.all([
     getAllOrders(),
     getAllUsers(),
-    getAllProducts()
+    getAllProducts(),
+    getAnalyticsStats()
   ]);
 
   const paidOrders = orders.filter(o => o.status !== 'Pending');
@@ -22,5 +23,6 @@ export async function GET() {
     totalRevenue,
     totalUsers: users.length,
     totalProducts: products.length,
+    analytics
   });
 }

@@ -143,6 +143,39 @@ export async function getAllUsers() {
   return await users.find({}).toArray();
 }
 
+// Analytics helpers
+export async function logPageView(path, sessionId) {
+  const views = await getCollection('page_views');
+  const view = {
+    path,
+    sessionId,
+    timestamp: new Date().toISOString()
+  };
+  await views.insertOne(view);
+  return view;
+}
+
+export async function getAnalyticsStats() {
+  const views = await getCollection('page_views');
+  const totalViews = await views.countDocuments();
+  
+  // Calculate unique sessions
+  const uniqueSessions = await views.aggregate([
+    { $group: { _id: "$sessionId" } },
+    { $count: "total" }
+  ]).toArray();
+  const uniqueVisitors = uniqueSessions.length > 0 ? uniqueSessions[0].total : 0;
+  
+  // Get top 5 popular pages
+  const popularPages = await views.aggregate([
+    { $group: { _id: "$path", views: { $sum: 1 } } },
+    { $sort: { views: -1 } },
+    { $limit: 5 }
+  ]).toArray();
+
+  return { totalViews, uniqueVisitors, popularPages };
+}
+
 // Legacy helpers (can be removed later)
 export function readJSON(filename) { return []; }
 export function writeJSON(filename, data) { return true; }

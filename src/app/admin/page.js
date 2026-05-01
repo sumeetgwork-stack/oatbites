@@ -57,7 +57,31 @@ export default function AdminDashboard() {
           <div className="stat-value">{stats?.totalProducts || 0}</div>
           <div className="stat-label">Products</div>
         </div>
+        <div className="stat-card glass-panel">
+          <div className="stat-icon">👁️</div>
+          <div className="stat-value">{stats?.analytics?.totalViews || 0}</div>
+          <div className="stat-label">Page Views</div>
+        </div>
+        <div className="stat-card glass-panel">
+          <div className="stat-icon">👤</div>
+          <div className="stat-value">{stats?.analytics?.uniqueVisitors || 0}</div>
+          <div className="stat-label">Unique Visitors</div>
+        </div>
       </div>
+
+      {stats?.analytics?.popularPages && stats.analytics.popularPages.length > 0 && (
+        <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', borderRadius: '20px' }}>
+          <h2 style={{ marginBottom: '1rem' }}>Most Popular Pages</h2>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {stats.analytics.popularPages.map((page, index) => (
+              <li key={index} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.8rem 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                <span style={{ fontWeight: 500 }}>{page._id}</span>
+                <span style={{ color: 'var(--accent-color)', fontWeight: 'bold' }}>{page.views} views</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="admin-nav-grid">
         <Link href="/admin/products" className="admin-nav-card glass-panel">
