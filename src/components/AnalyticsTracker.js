@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AnalyticsTracker() {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Generate a simple session ID if not exists
@@ -19,12 +21,16 @@ export default function AnalyticsTracker() {
       fetch('/api/analytics/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: pathname, sessionId })
+        body: JSON.stringify({ 
+          path: pathname, 
+          sessionId,
+          email: user?.email || null 
+        })
       }).catch(() => {
         // Silently fail if tracking fails
       });
     }
-  }, [pathname]);
+  }, [pathname, user]);
 
   return null; // This component doesn't render anything
 }

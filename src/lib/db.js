@@ -19,6 +19,7 @@ export async function createUser(userData) {
   const newUser = {
     name: userData.name,
     email: userData.email,
+    gender: userData.gender || 'Not Specified',
     image: userData.image || null,
     password: userData.password || null,
     role: userData.email === process.env.ADMIN_EMAIL ? 'admin' : 'user',
@@ -144,11 +145,12 @@ export async function getAllUsers() {
 }
 
 // Analytics helpers
-export async function logPageView(path, sessionId) {
+export async function logPageView(path, sessionId, email = null) {
   const views = await getCollection('page_views');
   const view = {
     path,
     sessionId,
+    email,
     timestamp: new Date().toISOString()
   };
   await views.insertOne(view);
@@ -181,15 +183,29 @@ export async function getAnalyticsStats() {
     { $sort: { _id: 1 } }
   ]).toArray();
 
-  // Get unique visitors distribution by path for pie chart
+  // Get unique visitors distribution by Gender
   const visitorDistribution = await views.aggregate([
-    { $group: { _id: "$path", uniqueSessions: { $addToSet: "$sessionId" } } },
-    { $project: { _id: 1, count: { $size: "$uniqueSessions" } } },
-    { $sort: { count: -1 } },
-    { $limit: 5 }
+    { $match: { email: { $ne: null } } },
+    { $group: { _id: "$email" } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "email",
+        as: "user"
+      }
+    },
+    { $unwind: "$user" },
+    { $group: { _id: "$user.gender", count: { $sum: 1 } } },
+    { $sort: { count: -1 } }
   ]).toArray();
 
-  return { totalViews, uniqueVisitors, dailyViews, visitorDistribution };
+  const finalDistribution = visitorDistribution.length > 0 ? visitorDistribution : [
+    { _id: 'Men', count: 0 },
+    { _id: 'Women', count: 0 }
+  ];
+
+  return { totalViews, uniqueVisitors, dailyViews, visitorDistribution: finalDistribution };
 }
 
 // Legacy helpers (can be removed later)

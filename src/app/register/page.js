@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [gender, setGender] = useState('Men');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,7 +35,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, gender }),
       });
       
       const data = await res.json();
@@ -115,6 +116,15 @@ export default function RegisterPage() {
                 minLength={6}
                 className="auth-input"
               />
+
+              <div style={{ display: 'flex', gap: '2rem', margin: '0.5rem 0 1.5rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input type="radio" name="gender" value="Men" checked={gender === 'Men'} onChange={e => setGender(e.target.value)} style={{ accentColor: 'var(--accent-color)' }} /> Men
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input type="radio" name="gender" value="Women" checked={gender === 'Women'} onChange={e => setGender(e.target.value)} style={{ accentColor: 'var(--accent-color)' }} /> Women
+                </label>
+              </div>
               <button type="submit" className="btn-primary auth-submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Creating account...' : 'Sign Up'}
               </button>
