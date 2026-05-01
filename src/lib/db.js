@@ -184,7 +184,7 @@ export async function getAnalyticsStats() {
   ]).toArray();
 
   // Get unique visitors distribution by Gender
-  const visitorDistribution = await views.aggregate([
+  const stats = await views.aggregate([
     { $match: { email: { $ne: null } } },
     { $group: { _id: "$email" } },
     {
@@ -196,13 +196,20 @@ export async function getAnalyticsStats() {
       }
     },
     { $unwind: "$user" },
-    { $group: { _id: "$user.gender", count: { $sum: 1 } } },
-    { $sort: { count: -1 } }
+    { $group: { _id: "$user.gender", count: { $sum: 1 } } }
   ]).toArray();
 
-  const finalDistribution = visitorDistribution.length > 0 ? visitorDistribution : [
-    { _id: 'Men', count: 0 },
-    { _id: 'Women', count: 0 }
+  // Ensure we always have Men and Women in the result for the chart legend
+  const distributionMap = { 'Men': 0, 'Women': 0 };
+  stats.forEach(s => {
+    if (s._id === 'Men' || s._id === 'Women') {
+      distributionMap[s._id] = s.count;
+    }
+  });
+
+  const finalDistribution = [
+    { _id: 'Men', count: distributionMap['Men'] },
+    { _id: 'Women', count: distributionMap['Women'] }
   ];
 
   return { totalViews, uniqueVisitors, dailyViews, visitorDistribution: finalDistribution };
