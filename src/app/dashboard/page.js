@@ -158,9 +158,9 @@ export default function DashboardPage() {
 
                 <div className="fk-nav-group">
                   <h3><span className="fk-icon">💳</span> PAYMENTS</h3>
-                  <button className="fk-nav-subbtn disabled">Gift Cards</button>
-                  <button className="fk-nav-subbtn disabled">Saved UPI</button>
-                  <button className="fk-nav-subbtn disabled">Saved Cards</button>
+                  <button onClick={() => setActiveTab('giftcards')} className={`fk-nav-subbtn ${activeTab === 'giftcards' ? 'active' : ''}`}>Gift Cards</button>
+                  <button onClick={() => setActiveTab('upi')} className={`fk-nav-subbtn ${activeTab === 'upi' ? 'active' : ''}`}>Saved UPI</button>
+                  <button onClick={() => setActiveTab('cards')} className={`fk-nav-subbtn ${activeTab === 'cards' ? 'active' : ''}`}>Saved Cards</button>
                 </div>
               </div>
             </aside>
@@ -297,6 +297,40 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {activeTab === 'giftcards' && (
+                <div className="fk-tab-content">
+                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Gift Cards</h2>
+                  <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎁</div>
+                    <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Gift Cards found</p>
+                    <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You haven't added any gift cards yet.</p>
+                    <button className="fk-save-btn" style={{ display: 'inline-block' }}>ADD A GIFT CARD</button>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'upi' && (
+                <div className="fk-tab-content">
+                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Saved UPI</h2>
+                  <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
+                    <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved UPI IDs</p>
+                    <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>Save your UPI IDs for faster payments.</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'cards' && (
+                <div className="fk-tab-content">
+                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Saved Cards</h2>
+                  <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
+                    <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved Cards</p>
+                    <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You can save your Credit/Debit cards for a seamless checkout experience.</p>
+                  </div>
                 </div>
               )}
             </section>
