@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useToast } from '../../components/Toast';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 const Scene = dynamic(() => import('../../components/Scene'), { ssr: false });
 
@@ -17,31 +18,30 @@ export default function DashboardPage() {
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
-  // Profile editing state
-  const [editMode, setEditMode] = useState(false);
+  // Layout state
+  const [activeTab, setActiveTab] = useState('profile');
+
+  // Profile state
   const [profileLoading, setProfileLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [profile, setProfile] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
+    name: '', email: '', phone: '', address: '', gender: '', addresses: []
   });
 
+  // Addresses state
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({ name: '', phone: '', pincode: '', locality: '', address: '', city: '', state: '', type: 'Home' });
+
   useEffect(() => {
-    if (!isLoading && !isLoggedIn) {
-      router.push('/login');
-    }
+    if (!isLoading && !isLoggedIn) router.push('/login');
   }, [isLoggedIn, isLoading, router]);
 
   useEffect(() => {
     if (isLoggedIn) {
       fetch('/api/orders/user')
         .then(res => res.json())
-        .then(data => {
-          setOrders(data.orders || []);
-          setLoadingOrders(false);
-        })
+        .then(data => { setOrders(data.orders || []); setLoadingOrders(false); })
         .catch(() => setLoadingOrders(false));
 
       fetch('/api/user/profile')
@@ -52,18 +52,12 @@ export default function DashboardPage() {
             email: data.email || user?.email || '',
             phone: data.phone || '',
             address: data.address || '',
+            gender: data.gender || '',
+            addresses: data.addresses || []
           });
           setProfileLoading(false);
         })
-        .catch(() => {
-          setProfile({
-            name: user?.name || '',
-            email: user?.email || '',
-            phone: '',
-            address: '',
-          });
-          setProfileLoading(false);
-        });
+        .catch(() => setProfileLoading(false));
     }
   }, [isLoggedIn, user]);
 
@@ -73,14 +67,10 @@ export default function DashboardPage() {
       const res = await fetch('/api/user/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: profile.name,
-          phone: profile.phone,
-          address: profile.address,
-        }),
+        body: JSON.stringify({ name: profile.name, phone: profile.phone, address: profile.address, gender: profile.gender, addresses: profile.addresses }),
       });
       if (res.ok) {
-        addToast(t('profileUpdated'), 'success');
+        addToast('Profile updated successfully!', 'success');
         setEditMode(false);
       } else {
         addToast('Failed to update profile.', 'error');
@@ -91,187 +81,213 @@ export default function DashboardPage() {
     setSaving(false);
   };
 
-  if (isLoading || !isLoggedIn) {
-    return (
-      <main className="main-wrapper">
-        <div className="fixed-bg"><Scene /></div>
-        <div className="content-layer">
-          <div className="page-container">
-            <p style={{ textAlign: 'center', padding: '4rem' }}>Loading...</p>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  const statusColor = (status) => {
-    switch(status) {
-      case 'Paid': return '#27ae60';
-      case 'Processing': return '#f39c12';
-      case 'Shipped': return '#3498db';
-      case 'Delivered': return '#2ecc71';
-      case 'Pending': return '#e74c3c';
-      default: return '#95a5a6';
-    }
+  const handleSaveAddress = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    const updatedAddresses = [...profile.addresses, { ...newAddress, id: Date.now().toString() }];
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...profile, addresses: updatedAddresses }),
+      });
+      if (res.ok) {
+        setProfile({ ...profile, addresses: updatedAddresses });
+        setShowAddAddress(false);
+        setNewAddress({ name: '', phone: '', pincode: '', locality: '', address: '', city: '', state: '', type: 'Home' });
+        addToast('Address added successfully!', 'success');
+      }
+    } catch (err) {}
+    setSaving(false);
   };
 
+  const handleDeleteAddress = async (id) => {
+    const updatedAddresses = profile.addresses.filter(a => a.id !== id);
+    setProfile({ ...profile, addresses: updatedAddresses });
+    await fetch('/api/user/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...profile, addresses: updatedAddresses }),
+    });
+    addToast('Address removed', 'success');
+  };
+
+  if (isLoading || !isLoggedIn) return <div className="page-container" style={{paddingTop:'100px', textAlign:'center'}}>Loading...</div>;
+
   return (
-    <main className="main-wrapper">
+    <main className="main-wrapper" style={{ background: '#f1f3f6', minHeight: '100vh' }}>
       <div className="fixed-bg"><Scene /></div>
       <div className="content-layer">
-        <div className="page-container">
-          {/* Profile Card */}
-          <div className="dashboard-header">
-            <div className="dashboard-profile glass-panel">
-              {user?.image ? (
-                <img src={user.image} alt={user.name} className="dashboard-avatar" referrerPolicy="no-referrer" />
-              ) : (
-                <div className="dashboard-avatar-placeholder">
-                  {user?.name?.charAt(0) || 'U'}
+        <div className="page-container fk-dashboard" style={{ paddingTop: '2rem' }}>
+          
+          <div className="fk-layout-grid">
+            {/* LEFT SIDEBAR */}
+            <aside className="fk-sidebar">
+              <div className="fk-sidebar-profile">
+                <div className="fk-avatar">
+                  {user?.image ? <img src={user.image} alt="User" referrerPolicy="no-referrer" /> : <span>{profile.name?.charAt(0) || 'U'}</span>}
+                </div>
+                <div className="fk-hello">
+                  <span>Hello,</span>
+                  <strong>{profile.name}</strong>
+                </div>
+              </div>
+
+              <div className="fk-sidebar-nav">
+                <button onClick={() => setActiveTab('orders')} className={`fk-nav-mainbtn ${activeTab === 'orders' ? 'active' : ''}`}>
+                  <span className="fk-icon">📦</span> MY ORDERS
+                </button>
+                
+                <div className="fk-nav-group">
+                  <h3><span className="fk-icon">👤</span> ACCOUNT SETTINGS</h3>
+                  <button onClick={() => setActiveTab('profile')} className={`fk-nav-subbtn ${activeTab === 'profile' ? 'active' : ''}`}>Profile Information</button>
+                  <button onClick={() => setActiveTab('addresses')} className={`fk-nav-subbtn ${activeTab === 'addresses' ? 'active' : ''}`}>Manage Addresses</button>
+                </div>
+
+                <div className="fk-nav-group">
+                  <h3><span className="fk-icon">💳</span> PAYMENTS</h3>
+                  <button className="fk-nav-subbtn disabled">Gift Cards</button>
+                  <button className="fk-nav-subbtn disabled">Saved UPI</button>
+                  <button className="fk-nav-subbtn disabled">Saved Cards</button>
+                </div>
+              </div>
+            </aside>
+
+            {/* RIGHT CONTENT */}
+            <section className="fk-content">
+              {activeTab === 'profile' && (
+                <div className="fk-tab-content">
+                  <div className="fk-tab-header">
+                    <h2>Personal Information</h2>
+                    <button className="fk-edit-link" onClick={() => setEditMode(!editMode)}>{editMode ? 'Cancel' : 'Edit'}</button>
+                  </div>
+                  
+                  <div className="fk-profile-form">
+                    <div className="fk-input-group">
+                      <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} disabled={!editMode} placeholder="Full Name" />
+                    </div>
+                    
+                    <h3 className="fk-field-label">Your Gender</h3>
+                    <div className="fk-radio-group">
+                      <label>
+                        <input type="radio" name="gender" value="Men" checked={profile.gender === 'Men'} disabled={!editMode || (profile.gender && profile.gender !== 'Not Specified')} onChange={e => setProfile({...profile, gender: e.target.value})} /> Male
+                      </label>
+                      <label>
+                        <input type="radio" name="gender" value="Women" checked={profile.gender === 'Women'} disabled={!editMode || (profile.gender && profile.gender !== 'Not Specified')} onChange={e => setProfile({...profile, gender: e.target.value})} /> Female
+                      </label>
+                    </div>
+
+                    <h3 className="fk-field-label">Email Address</h3>
+                    <div className="fk-input-group">
+                      <input type="email" value={profile.email} disabled placeholder="Email Address" />
+                    </div>
+
+                    <h3 className="fk-field-label">Mobile Number</h3>
+                    <div className="fk-input-group">
+                      <input type="tel" value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} disabled={!editMode} placeholder="+91 9876543210" />
+                    </div>
+
+                    {editMode && (
+                      <button className="fk-save-btn" onClick={handleSaveProfile} disabled={saving}>
+                        {saving ? 'SAVING...' : 'SAVE'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
-              <div className="dashboard-user-info">
-                <h1>{profile.name || user?.name}</h1>
-                <p>{profile.email || user?.email}</p>
-                {profile.phone && <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>📱 {profile.phone}</p>}
-                {profile.address && <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>📍 {profile.address}</p>}
-                <span className={`role-badge ${user?.role === 'admin' ? 'admin' : 'user'}`}>
-                  {user?.role === 'admin' ? '👑 Admin' : `🛍️ ${t('customer')}`}
-                </span>
-              </div>
-              <button 
-                className="btn-outline profile-edit-btn"
-                onClick={() => setEditMode(!editMode)}
-                style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}
-              >
-                {editMode ? t('cancel') : `✏️ ${t('editProfile')}`}
-              </button>
-            </div>
-          </div>
 
-          {/* Profile Edit Form */}
-          {editMode && (
-            <div className="profile-edit-section glass-panel" style={{ marginBottom: '2rem', padding: '2rem' }}>
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.5rem' }}>{t('editProfile')}</h2>
-              <div className="profile-edit-grid">
-                <div className="profile-edit-field">
-                  <label>{t('name')}</label>
-                  <input 
-                    type="text" 
-                    value={profile.name} 
-                    onChange={e => setProfile({...profile, name: e.target.value})}
-                    className="auth-input"
-                  />
-                </div>
-                <div className="profile-edit-field">
-                  <label>{t('email')}</label>
-                  <input 
-                    type="email" 
-                    value={profile.email} 
-                    disabled
-                    className="auth-input"
-                    style={{ opacity: 0.6, cursor: 'not-allowed' }}
-                    title="Email cannot be changed"
-                  />
-                </div>
-                <div className="profile-edit-field full-width">
-                  <label>Gender {profile.gender && profile.gender !== 'Not Specified' ? '(Cannot be changed)' : ''}</label>
-                  {(profile.gender && profile.gender !== 'Not Specified') ? (
-                    <input 
-                      type="text" 
-                      value={profile.gender === 'Men' ? t('men') || 'Men' : t('women') || 'Women'} 
-                      disabled
-                      className="auth-input"
-                      style={{ opacity: 0.6, cursor: 'not-allowed' }}
-                    />
+              {activeTab === 'addresses' && (
+                <div className="fk-tab-content">
+                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Manage Addresses</h2>
+                  
+                  {!showAddAddress ? (
+                    <button className="fk-add-address-btn" onClick={() => setShowAddAddress(true)}>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>+</span> ADD A NEW ADDRESS
+                    </button>
                   ) : (
-                    <div style={{ display: 'flex', gap: '2rem', padding: '0.8rem', background: 'rgba(255,255,255,0.5)', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                        <input type="radio" name="gender" value="Men" checked={profile.gender === 'Men'} onChange={e => setProfile({...profile, gender: e.target.value})} style={{ accentColor: 'var(--accent-color)' }} /> {t('men') || 'Men'}
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                        <input type="radio" name="gender" value="Women" checked={profile.gender === 'Women'} onChange={e => setProfile({...profile, gender: e.target.value})} style={{ accentColor: 'var(--accent-color)' }} /> {t('women') || 'Women'}
-                      </label>
+                    <div className="fk-address-form-container">
+                      <h3 style={{ color: '#2874f0', marginBottom: '16px', fontSize: '14px', fontWeight: '500' }}>ADD A NEW ADDRESS</h3>
+                      <form onSubmit={handleSaveAddress} className="fk-address-form">
+                        <div className="fk-form-row">
+                          <input type="text" placeholder="Name" required value={newAddress.name} onChange={e => setNewAddress({...newAddress, name: e.target.value})} />
+                          <input type="text" placeholder="10-digit mobile number" required value={newAddress.phone} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} />
+                        </div>
+                        <div className="fk-form-row">
+                          <input type="text" placeholder="Pincode" required value={newAddress.pincode} onChange={e => setNewAddress({...newAddress, pincode: e.target.value})} />
+                          <input type="text" placeholder="Locality" required value={newAddress.locality} onChange={e => setNewAddress({...newAddress, locality: e.target.value})} />
+                        </div>
+                        <div className="fk-form-row full">
+                          <textarea placeholder="Address (Area and Street)" required rows="3" value={newAddress.address} onChange={e => setNewAddress({...newAddress, address: e.target.value})}></textarea>
+                        </div>
+                        <div className="fk-form-row">
+                          <input type="text" placeholder="City/District/Town" required value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} />
+                          <input type="text" placeholder="State" required value={newAddress.state} onChange={e => setNewAddress({...newAddress, state: e.target.value})} />
+                        </div>
+                        <div className="fk-radio-group" style={{ margin: '16px 0' }}>
+                          <span style={{ fontSize: '14px', color: '#878787', marginRight: '16px' }}>Address Type</span>
+                          <label><input type="radio" name="type" value="Home" checked={newAddress.type === 'Home'} onChange={e => setNewAddress({...newAddress, type: e.target.value})} /> Home</label>
+                          <label><input type="radio" name="type" value="Work" checked={newAddress.type === 'Work'} onChange={e => setNewAddress({...newAddress, type: e.target.value})} /> Work</label>
+                        </div>
+                        <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
+                          <button type="submit" className="fk-save-btn" style={{ marginTop: 0 }} disabled={saving}>SAVE AND DELIVER HERE</button>
+                          <button type="button" className="fk-cancel-btn" onClick={() => setShowAddAddress(false)}>CANCEL</button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                  <div className="fk-address-list">
+                    {profile.addresses?.map((addr) => (
+                      <div key={addr.id} className="fk-address-card">
+                        <div className="fk-address-header">
+                          <span className="fk-address-type">{addr.type}</span>
+                          <button onClick={() => handleDeleteAddress(addr.id)} className="fk-delete-btn">Delete</button>
+                        </div>
+                        <p className="fk-address-name"><strong>{addr.name}</strong> &nbsp;&nbsp; <strong>{addr.phone}</strong></p>
+                        <p className="fk-address-detail">{addr.address}, {addr.locality}</p>
+                        <p className="fk-address-detail">{addr.city}, {addr.state} - <strong>{addr.pincode}</strong></p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'orders' && (
+                <div className="fk-tab-content">
+                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>My Orders</h2>
+                  {loadingOrders ? <p style={{ padding: '2rem', textAlign: 'center' }}>Loading orders...</p> : orders.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                      <p style={{ fontSize: '1.2rem', color: '#878787', marginBottom: '1rem' }}>No orders found.</p>
+                      <Link href="/products" className="fk-save-btn" style={{ textDecoration: 'none', display: 'inline-block' }}>START SHOPPING</Link>
+                    </div>
+                  ) : (
+                    <div className="fk-orders-list">
+                      {orders.map(order => (
+                        <div key={order.id} className="fk-order-card">
+                          <div className="fk-order-images">
+                            {order.items.slice(0, 3).map((item, i) => (
+                              <div key={i} className="fk-order-thumb" title={item.name}>
+                                {item.image ? <img src={item.image} alt={item.name} /> : <span>📦</span>}
+                              </div>
+                            ))}
+                            {order.items.length > 3 && <div className="fk-order-thumb-more">+{order.items.length - 3}</div>}
+                          </div>
+                          <div className="fk-order-details">
+                            <p className="fk-order-title">{order.items.map(i => i.name).join(', ')}</p>
+                            <p className="fk-order-date">Ordered on {new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+                          </div>
+                          <div className="fk-order-price">₹{order.total?.toLocaleString('en-IN')}</div>
+                          <div className="fk-order-status">
+                            <span className={`fk-status-dot ${order.status.toLowerCase()}`}></span>
+                            {order.status}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-                <div className="profile-edit-field">
-                  <label>{t('phone')}</label>
-                  <input 
-                    type="tel" 
-                    value={profile.phone} 
-                    onChange={e => setProfile({...profile, phone: e.target.value})}
-                    placeholder="+91 98765 43210"
-                    className="auth-input"
-                  />
-                </div>
-                <div className="profile-edit-field full-width">
-                  <label>{t('address')}</label>
-                  <input 
-                    type="text" 
-                    value={profile.address} 
-                    onChange={e => setProfile({...profile, address: e.target.value})}
-                    placeholder="123 Street, City, State - 400001"
-                    className="auth-input"
-                  />
-                </div>
-              </div>
-              <button 
-                className="btn-primary" 
-                onClick={handleSaveProfile}
-                disabled={saving}
-                style={{ marginTop: '1.5rem' }}
-              >
-                {saving ? t('saving') : t('saveChanges')}
-              </button>
-            </div>
-          )}
-
-          {/* Orders Section */}
-          <div className="dashboard-section">
-            <h2 className="section-title" style={{ textAlign: 'left' }}>{t('yourOrders')}</h2>
-            
-            {loadingOrders ? (
-              <p className="empty-state">Loading orders...</p>
-            ) : orders.length === 0 ? (
-              <div className="empty-state glass-panel">
-                <p>🛒 {t('noOrders')}</p>
-                <a href="/products" className="btn-primary" style={{ marginTop: '1rem' }}>{t('startShopping')}</a>
-              </div>
-            ) : (
-              <div className="orders-list">
-                {orders.map(order => (
-                  <div key={order.id} className="order-card glass-panel">
-                    <div className="order-card-header">
-                      <div>
-                        <span className="order-id">#{order.id?.slice(-8)}</span>
-                        <span className="order-date">
-                          {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric', month: 'short', year: 'numeric'
-                          })}
-                        </span>
-                      </div>
-                      <span className="status-badge" style={{ background: statusColor(order.status) }}>
-                        {order.status}
-                      </span>
-                    </div>
-                    <div className="order-items-summary">
-                      {order.items?.map((item, i) => (
-                        <span key={i} className="order-item-chip">
-                          {item.name} × {item.quantity}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="order-card-footer">
-                      <span className="order-total">₹{order.total?.toLocaleString('en-IN')}</span>
-                      {order.shippingAddress && (
-                        <span className="order-address">📍 {order.shippingAddress.city}</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+              )}
+            </section>
           </div>
         </div>
       </div>

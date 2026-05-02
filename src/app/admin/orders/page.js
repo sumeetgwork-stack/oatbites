@@ -50,20 +50,22 @@ export default function AdminOrdersPage() {
   if (isLoading || !isAdmin) return null;
 
   return (
-    <div className="page-container admin-page">
-      <div className="admin-header">
-        <div>
-          <Link href="/admin" className="back-link">← Back to Dashboard</Link>
-          <h1>Manage Orders</h1>
-        </div>
-      </div>
+    <main className="main-wrapper">
+      <div className="content-layer">
+        <div className="page-container admin-page" style={{ paddingTop: '2rem' }}>
+          <div className="admin-header">
+            <div>
+              <Link href="/admin" className="back-link">← Back to Dashboard</Link>
+              <h1 style={{ fontSize: '1.5rem' }}>Manage Orders</h1>
+            </div>
+          </div>
 
       {orders.length === 0 ? (
         <div className="empty-state glass-panel">
           <p>No orders yet.</p>
         </div>
       ) : (
-        <div className="admin-orders-list">
+        <div className="admin-orders-list" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
           {orders.map(order => (
             <div key={order.id} className="admin-order-card glass-panel">
               <div className="admin-order-card-top">
@@ -122,6 +124,8 @@ export default function AdminOrdersPage() {
           ))}
         </div>
       )}
-    </div>
+        </div>
+      </div>
+    </main>
   );
 }

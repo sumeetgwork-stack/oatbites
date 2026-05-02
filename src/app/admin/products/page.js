@@ -85,18 +85,20 @@ export default function AdminProductsPage() {
   if (isLoading || !isAdmin) return null;
 
   return (
-    <div className="page-container admin-page">
-      <div className="admin-header">
-        <div>
-          <Link href="/admin" className="back-link">← Back to Dashboard</Link>
-          <h1>Manage Products</h1>
-        </div>
-        <button className="btn-primary" onClick={openAdd}>+ Add Product</button>
-      </div>
+    <main className="main-wrapper">
+      <div className="content-layer">
+        <div className="page-container admin-page" style={{ paddingTop: '2rem' }}>
+          <div className="admin-header">
+            <div>
+              <Link href="/admin" className="back-link">← Back to Dashboard</Link>
+              <h1 style={{ fontSize: '1.5rem' }}>Manage Products</h1>
+            </div>
+            <button className="btn-primary" onClick={openAdd}>+ Add Product</button>
+          </div>
 
-      <div className="admin-table-container glass-panel">
-        <table className="admin-table">
-          <thead>
+      <div className="admin-table-container glass-panel" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+        <table className="admin-table" style={{ width: '100%' }}>
+          <thead style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}>
             <tr>
               <th>Name</th>
               <th>Category</th>
@@ -181,6 +183,8 @@ export default function AdminProductsPage() {
           </div>
         </div>
       )}
-    </div>
+        </div>
+      </div>
+    </main>
   );
 }

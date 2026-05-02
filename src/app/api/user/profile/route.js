@@ -20,6 +20,7 @@ export async function GET() {
     email: user.email,
     phone: user.phone || '',
     address: user.address || '',
+    addresses: user.addresses || [],
     gender: user.gender || '',
   });
 }
@@ -31,7 +32,7 @@ export async function PATCH(req) {
   }
 
   try {
-    const { phone, address, name, gender } = await req.json();
+    const { phone, address, name, gender, addresses } = await req.json();
     const { updateUserProfile } = await import('@/lib/db');
     
     // If gender is being set, check if it's already set (one-time only)
@@ -42,7 +43,7 @@ export async function PATCH(req) {
       }
     }
     
-    const result = await updateUserProfile(session.user.email, { phone, address, name, gender });
+    const result = await updateUserProfile(session.user.email, { phone, address, name, gender, addresses });
     if (!result) {
       return NextResponse.json({ error: 'Update failed' }, { status: 500 });
     }
