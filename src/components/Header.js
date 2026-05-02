@@ -70,7 +70,7 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="header-left">
+      <div className="header-left-col">
         <Link href="/" className="logo">
           OATBITES <span style={{fontWeight: 300}}>BY SEJ</span>
         </Link>
@@ -127,8 +127,6 @@ export default function Header() {
       </div>
 
       <nav className="nav-links">
-        <Link href="/about" className="nav-link">{t('aboutUs')}</Link>
-        
         {isLoggedIn && isAdmin && (
           <Link href="/admin" className="nav-link admin-link">{t('admin')}</Link>
         )}
