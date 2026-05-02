@@ -94,6 +94,20 @@ export default function AdminOrdersPage() {
                   </div>
                 </div>
 
+                <div className="admin-order-detail" style={{ borderTop: '1px solid #f0f0f0', paddingTop: '10px', marginTop: '10px' }}>
+                  <span className="admin-order-detail-label">📍 Shipping To</span>
+                  <div style={{ marginTop: '5px', fontSize: '13px', lineHeight: '1.4' }}>
+                    {order.shippingAddress ? (
+                      <>
+                        <strong>{order.shippingAddress.fullName}</strong> ({order.shippingAddress.phone})<br/>
+                        {order.shippingAddress.street}, {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}
+                      </>
+                    ) : (
+                      <span style={{ color: '#888' }}>No address details found</span>
+                    )}
+                  </div>
+                </div>
+
                 <div className="admin-order-meta-row">
                   <div className="admin-order-detail">
                     <span className="admin-order-detail-label">💰 Total</span>

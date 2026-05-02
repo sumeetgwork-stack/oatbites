@@ -127,8 +127,23 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div className="glass-panel" style={{ padding: '15px', border: '1px solid #eee' }}>
-                  <p style={{ fontSize: '0.8rem', color: '#878787', margin: '0 0 5px 0', textTransform: 'uppercase' }}>Default Address</p>
-                  <p style={{ margin: 0, fontWeight: '500' }}>{selectedUser.address || 'Not Provided'}</p>
+                  <p style={{ fontSize: '0.8rem', color: '#878787', margin: '0 0 5px 0', textTransform: 'uppercase' }}>Saved Addresses</p>
+                  {selectedUser.addresses?.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px', maxHeight: '200px', overflowY: 'auto', paddingRight: '5px' }}>
+                      {selectedUser.addresses.map((addr, idx) => (
+                        <div key={idx} style={{ padding: '10px', background: '#f9f9f9', borderRadius: '4px', border: '1px solid #eee' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                            <span style={{ fontSize: '9px', textTransform: 'uppercase', background: '#e0e0e0', padding: '2px 6px', borderRadius: '2px', fontWeight: 'bold', color: '#555' }}>{addr.type}</span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: '13px' }}><strong>{addr.name}</strong> ({addr.phone})</p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#555' }}>{addr.address}, {addr.locality}</p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#555' }}>{addr.city}, {addr.state} - {addr.pincode}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ margin: 0, fontWeight: '500' }}>{selectedUser.address || 'No addresses saved'}</p>
+                  )}
                 </div>
               </div>
             </div>

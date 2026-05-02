@@ -31,6 +31,8 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  const [activeAddress, setActiveAddress] = useState(null);
+
   // Fetch user profile for addresses
   useEffect(() => {
     if (isLoggedIn) {
@@ -38,13 +40,14 @@ export default function Header() {
         .then(res => res.json())
         .then(data => {
           if (data.address) setUserAddress(data.address);
-          if (data.addresses) setUserAddresses(data.addresses);
-          
-          // Set active address from localStorage or default to first one
-          const savedAddrId = localStorage.getItem('activeDeliveryAddressId');
-          if (savedAddrId && data.addresses) {
-            const found = data.addresses.find(a => a.id === savedAddrId);
+          if (data.addresses) {
+            setUserAddresses(data.addresses);
+            
+            // Set active address from localStorage or default to first one
+            const savedAddrId = localStorage.getItem('activeDeliveryAddressId');
+            const found = data.addresses.find(a => a.id === savedAddrId) || data.addresses[0];
             if (found) {
+              setActiveAddress(found);
               const formatted = `${found.address}, ${found.locality}, ${found.city}, ${found.state} - ${found.pincode}`;
               setUserAddress(formatted);
             }
@@ -55,16 +58,15 @@ export default function Header() {
   }, [isLoggedIn]);
 
   const selectAddress = (addr) => {
+    setActiveAddress(addr);
     const formatted = `${addr.address}, ${addr.locality}, ${addr.city}, ${addr.state} - ${addr.pincode}`;
     setUserAddress(formatted);
     localStorage.setItem('activeDeliveryAddressId', addr.id);
     setAddressOpen(false);
   };
 
-  // Extract short address (city or first part)
-  const shortAddress = userAddress
-    ? userAddress.split(',').reverse()[1]?.trim() || userAddress.split(',').pop()?.trim() || userAddress.slice(0, 15)
-    : '';
+  // Display name or user name
+  const displayName = activeAddress?.name || user?.name || '';
 
   return (
     <header className="header">
@@ -84,7 +86,7 @@ export default function Header() {
               <span className="nav-address-icon">📍</span>
               <div className="nav-address-text">
                 <span className="nav-address-label">{t('deliverTo')}</span>
-                <span className="nav-address-value">{shortAddress || t('setAddress')}</span>
+                <span className="nav-address-value">{displayName || t('setAddress')}</span>
               </div>
             </button>
 
