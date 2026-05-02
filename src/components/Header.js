@@ -12,6 +12,7 @@ export default function Header() {
   const { user, isLoggedIn, isAdmin } = useAuth();
   const { locale, changeLanguage, t, LANGUAGE_NAMES } = useLanguage();
   const [langOpen, setLangOpen] = useState(false);
+  const [userAddress, setUserAddress] = useState('');
   const langRef = useRef(null);
 
   useEffect(() => {
@@ -24,11 +25,44 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  // Fetch user address for navbar display
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetch('/api/user/profile')
+        .then(res => res.json())
+        .then(data => {
+          if (data.address) {
+            setUserAddress(data.address);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isLoggedIn]);
+
+  // Extract short address (city or first part)
+  const shortAddress = userAddress
+    ? userAddress.split(',').pop()?.trim() || userAddress.slice(0, 20)
+    : '';
+
   return (
     <header className="header glass-panel">
-      <Link href="/" className="logo">
-        OATBITES <span style={{fontWeight: 300}}>BY SEJ</span>
-      </Link>
+      <div className="header-left">
+        <Link href="/" className="logo">
+          OATBITES <span style={{fontWeight: 300}}>BY SEJ</span>
+        </Link>
+        
+        {/* Amazon-style Address Display */}
+        {isLoggedIn && (
+          <Link href="/dashboard" className="nav-address-btn" title={userAddress || 'Set your address'}>
+            <span className="nav-address-icon">📍</span>
+            <div className="nav-address-text">
+              <span className="nav-address-label">{t('deliverTo')}</span>
+              <span className="nav-address-value">{shortAddress || t('setAddress')}</span>
+            </div>
+          </Link>
+        )}
+      </div>
+
       <nav className="nav-links">
         <Link href="/about" className="nav-link">{t('aboutUs')}</Link>
         

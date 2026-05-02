@@ -164,6 +164,7 @@ export async function updateUserProfile(email, updates) {
   if (updates.phone !== undefined) allowedUpdates.phone = updates.phone;
   if (updates.address !== undefined) allowedUpdates.address = updates.address;
   if (updates.name !== undefined) allowedUpdates.name = updates.name;
+  if (updates.gender !== undefined) allowedUpdates.gender = updates.gender;
   
   const result = await users.findOneAndUpdate(
     { email },

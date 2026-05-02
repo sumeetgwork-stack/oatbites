@@ -174,6 +174,27 @@ export default function DashboardPage() {
                     title="Email cannot be changed"
                   />
                 </div>
+                <div className="profile-edit-field full-width">
+                  <label>Gender {profile.gender && profile.gender !== 'Not Specified' ? '(Cannot be changed)' : ''}</label>
+                  {(profile.gender && profile.gender !== 'Not Specified') ? (
+                    <input 
+                      type="text" 
+                      value={profile.gender === 'Men' ? t('men') || 'Men' : t('women') || 'Women'} 
+                      disabled
+                      className="auth-input"
+                      style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                    />
+                  ) : (
+                    <div style={{ display: 'flex', gap: '2rem', padding: '0.8rem', background: 'rgba(255,255,255,0.5)', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                        <input type="radio" name="gender" value="Men" checked={profile.gender === 'Men'} onChange={e => setProfile({...profile, gender: e.target.value})} style={{ accentColor: 'var(--accent-color)' }} /> {t('men') || 'Men'}
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                        <input type="radio" name="gender" value="Women" checked={profile.gender === 'Women'} onChange={e => setProfile({...profile, gender: e.target.value})} style={{ accentColor: 'var(--accent-color)' }} /> {t('women') || 'Women'}
+                      </label>
+                    </div>
+                  )}
+                </div>
                 <div className="profile-edit-field">
                   <label>{t('phone')}</label>
                   <input 

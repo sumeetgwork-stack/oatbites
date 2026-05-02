@@ -20,7 +20,7 @@ export async function GET() {
     email: user.email,
     phone: user.phone || '',
     address: user.address || '',
-    gender: user.gender || 'Not Specified',
+    gender: user.gender || '',
   });
 }
 
@@ -31,10 +31,18 @@ export async function PATCH(req) {
   }
 
   try {
-    const { phone, address, name } = await req.json();
+    const { phone, address, name, gender } = await req.json();
     const { updateUserProfile } = await import('@/lib/db');
     
-    const result = await updateUserProfile(session.user.email, { phone, address, name });
+    // If gender is being set, check if it's already set (one-time only)
+    if (gender) {
+      const existingUser = await findUserByEmail(session.user.email);
+      if (existingUser?.gender) {
+        return NextResponse.json({ error: 'Gender already set and cannot be changed' }, { status: 400 });
+      }
+    }
+    
+    const result = await updateUserProfile(session.user.email, { phone, address, name, gender });
     if (!result) {
       return NextResponse.json({ error: 'Update failed' }, { status: 500 });
     }
