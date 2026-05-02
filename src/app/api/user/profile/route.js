@@ -38,7 +38,7 @@ export async function PATCH(req) {
     // If gender is being set, check if it's already set (one-time only)
     if (gender) {
       const existingUser = await findUserByEmail(session.user.email);
-      if (existingUser?.gender) {
+      if (existingUser?.gender && existingUser.gender !== gender) {
         return NextResponse.json({ error: 'Gender already set and cannot be changed' }, { status: 400 });
       }
     }
