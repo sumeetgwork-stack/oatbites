@@ -30,8 +30,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AnalyticsTracker />
         <AuthProvider>
+          <AnalyticsTracker />
           <CartProvider>
             <ToastProvider>
               <Header />
