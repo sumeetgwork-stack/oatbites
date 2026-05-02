@@ -21,7 +21,7 @@ export default function AdminOrdersPage() {
   }, []);
 
   const fetchOrders = () => {
-    fetch('/api/admin/orders')
+    fetch('/api/admin/orders?t=' + Date.now())
       .then(res => res.json())
       .then(data => setOrders(data.orders || []))
       .catch(console.error);
@@ -63,52 +63,63 @@ export default function AdminOrdersPage() {
           <p>No orders yet.</p>
         </div>
       ) : (
-        <div className="admin-table-container glass-panel">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map(order => (
-                <tr key={order.id}>
-                  <td><strong>{order.id}</strong></td>
-                  <td>
-                    <div>{order.userName || 'N/A'}</div>
-                    <small style={{ color: '#888' }}>{order.userEmail}</small>
-                  </td>
-                  <td>
+        <div className="admin-orders-list">
+          {orders.map(order => (
+            <div key={order.id} className="admin-order-card glass-panel">
+              <div className="admin-order-card-top">
+                <div className="admin-order-id">
+                  <span className="admin-order-id-label">Order ID</span>
+                  <span className="admin-order-id-value">#{order.id?.slice(-8)}</span>
+                </div>
+                <span className="status-badge" style={{ background: statusColor(order.status) }}>
+                  {order.status}
+                </span>
+              </div>
+
+              <div className="admin-order-card-body">
+                <div className="admin-order-detail">
+                  <span className="admin-order-detail-label">👤 Customer</span>
+                  <span className="admin-order-detail-value">{order.userName || 'N/A'}</span>
+                  <small style={{ color: '#888', fontSize: '0.8rem' }}>{order.userEmail}</small>
+                </div>
+
+                <div className="admin-order-detail">
+                  <span className="admin-order-detail-label">📦 Items</span>
+                  <div className="admin-order-items-wrap">
                     {order.items?.map((item, i) => (
                       <span key={i} className="order-item-chip">{item.name} ×{item.quantity}</span>
                     ))}
-                  </td>
-                  <td><strong>₹{order.total?.toLocaleString('en-IN')}</strong></td>
-                  <td>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td>
-                  <td>
-                    <span className="status-badge" style={{ background: statusColor(order.status) }}>
-                      {order.status}
+                  </div>
+                </div>
+
+                <div className="admin-order-meta-row">
+                  <div className="admin-order-detail">
+                    <span className="admin-order-detail-label">💰 Total</span>
+                    <span className="admin-order-detail-value" style={{ fontWeight: 800, fontSize: '1.2rem' }}>
+                      ₹{order.total?.toLocaleString('en-IN')}
                     </span>
-                  </td>
-                  <td>
-                    <select 
-                      value={order.status}
-                      onChange={(e) => updateStatus(order.id, e.target.value)}
-                      className="status-select"
-                    >
-                      {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                  <div className="admin-order-detail">
+                    <span className="admin-order-detail-label">📅 Date</span>
+                    <span className="admin-order-detail-value">
+                      {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-order-card-footer">
+                <label className="admin-order-action-label">Update Status:</label>
+                <select 
+                  value={order.status}
+                  onChange={(e) => updateStatus(order.id, e.target.value)}
+                  className="status-select"
+                >
+                  {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

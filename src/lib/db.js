@@ -158,6 +158,21 @@ export async function getAllUsers() {
   return await users.find({}).toArray();
 }
 
+export async function updateUserProfile(email, updates) {
+  const users = await getCollection('users');
+  const allowedUpdates = {};
+  if (updates.phone !== undefined) allowedUpdates.phone = updates.phone;
+  if (updates.address !== undefined) allowedUpdates.address = updates.address;
+  if (updates.name !== undefined) allowedUpdates.name = updates.name;
+  
+  const result = await users.findOneAndUpdate(
+    { email },
+    { $set: allowedUpdates },
+    { returnDocument: 'after' }
+  );
+  return result;
+}
+
 // Analytics helpers
 export async function logPageView(path, sessionId, email = null) {
   const views = await getCollection('page_views');

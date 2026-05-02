@@ -1078,12 +1078,29 @@ a {
 .admin-nav-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
 .admin-nav-card p { color: var(--text-secondary); }
 
-/* Admin Table */
+/* Admin Table - keep for products page */
 .admin-table-container { padding: 0; overflow-x: auto; }
-.admin-table { width: 100%; border-collapse: collapse; }
-.admin-table th, .admin-table td { padding: 1.2rem 1.5rem; text-align: left; border-bottom: 1px solid #f0f0f0; }
-.admin-table th { font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }
+.admin-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.admin-table th, .admin-table td { padding: 1rem 1rem; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+.admin-table th { font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }
 .admin-table tr:last-child td { border-bottom: none; }
+
+/* Admin Order Cards */
+.admin-orders-list { display: flex; flex-direction: column; gap: 1.2rem; }
+.admin-order-card { padding: 1.5rem 2rem; border-radius: 20px; }
+.admin-order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.admin-order-id { display: flex; flex-direction: column; gap: 0.2rem; }
+.admin-order-id-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); font-weight: 700; }
+.admin-order-id-value { font-size: 1.1rem; font-weight: 800; font-family: 'Outfit', monospace; color: var(--accent-color); }
+.admin-order-card-body { display: flex; flex-direction: column; gap: 1rem; }
+.admin-order-detail { display: flex; flex-direction: column; gap: 0.3rem; }
+.admin-order-detail-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); font-weight: 700; }
+.admin-order-detail-value { font-size: 1rem; font-weight: 600; }
+.admin-order-items-wrap { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.admin-order-meta-row { display: flex; gap: 2rem; }
+.admin-order-card-footer { display: flex; align-items: center; gap: 1rem; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.06); }
+.admin-order-action-label { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); }
+
 .color-dot { width: 30px; height: 30px; border-radius: 8px; }
 .action-btn {
   padding: 0.4rem 1rem; border-radius: 8px; border: none; cursor: pointer;
@@ -1094,9 +1111,43 @@ a {
 .action-btn.delete { background: #ffebee; color: #c62828; }
 .action-btn.delete:hover { background: #ffcdd2; }
 .status-select {
-  padding: 0.4rem 0.8rem; border-radius: 8px; border: 1px solid #ddd;
-  font-size: 0.9rem; cursor: pointer; background: white;
+  padding: 0.5rem 1rem; border-radius: 10px; border: 2px solid #eee;
+  font-size: 0.9rem; cursor: pointer; background: white; font-weight: 600;
+  transition: border-color 0.2s;
 }
+.status-select:focus { outline: none; border-color: var(--accent-color); }
+
+/* Language Selector */
+.lang-selector-container { position: relative; }
+.lang-btn {
+  background: none !important; border: none !important; cursor: pointer;
+  display: flex !important; align-items: center; gap: 0.3rem;
+  font-size: 0.9rem !important; font-family: inherit; padding: 0.4rem 0.6rem !important;
+  border-radius: 8px; transition: background 0.2s;
+}
+.lang-btn:hover { background: rgba(0,0,0,0.05) !important; }
+.lang-code { font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; }
+.lang-dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0; background: white;
+  border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  min-width: 160px; z-index: 2000; overflow: hidden;
+  animation: fadeUp 0.25s ease forwards;
+}
+.lang-option {
+  display: block; width: 100%; padding: 0.75rem 1.2rem; border: none;
+  background: none; text-align: left; cursor: pointer; font-size: 0.95rem;
+  font-family: inherit; transition: background 0.15s; font-weight: 500;
+}
+.lang-option:hover { background: #f5f5f5; }
+.lang-option.active { background: var(--accent-color); color: white; font-weight: 700; }
+
+/* Profile Edit */
+.profile-edit-btn { font-size: 0.85rem !important; padding: 0.5rem 1.2rem !important; white-space: nowrap; }
+.profile-edit-section { animation: fadeUp 0.4s ease forwards; }
+.profile-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.profile-edit-field { display: flex; flex-direction: column; gap: 0.4rem; }
+.profile-edit-field label { font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+.profile-edit-field.full-width { grid-column: 1 / -1; }
 
 /* Modal */
 .modal-overlay {
@@ -1185,7 +1236,7 @@ a {
 
 @media (max-width: 768px) {
   .header { width: 95%; padding: 0.8rem 1rem; top: 0.8rem; }
-  .nav-links { gap: 1rem; }
+  .nav-links { gap: 0.6rem; }
   .nav-link { font-size: 0.85rem; padding: 0.4rem 0.8rem; }
   .cart-btn { font-size: 0.9rem !important; }
   .hero-title { font-size: 2.8rem; letter-spacing: -1px; }
@@ -1194,18 +1245,23 @@ a {
   .featured-section { margin: 2rem 1rem; padding: 2rem 1rem; }
   .product-grid { grid-template-columns: 1fr; }
   .product-details-grid { grid-template-columns: 1fr; gap: 2rem; }
-  .page-container { padding: 6rem 1rem 2rem; } /* Ensure top padding clears header */
+  .page-container { padding: 6rem 1rem 2rem; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-nav-grid { grid-template-columns: 1fr; }
   .checkout-layout { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .dashboard-profile { flex-direction: column; text-align: center; gap: 1rem; }
+  .profile-edit-btn { margin-left: 0 !important; align-self: center !important; }
+  .profile-edit-grid { grid-template-columns: 1fr; }
+  .admin-order-card { padding: 1.2rem 1.5rem; }
+  .admin-order-meta-row { flex-direction: column; gap: 1rem; }
+  .lang-code { display: none; }
 }
 
 @media (max-width: 480px) {
   .header { padding: 0.6rem 0.6rem; }
   .logo { font-size: 0.95rem; }
-  .nav-links { gap: 0.4rem; }
+  .nav-links { gap: 0.3rem; }
   .nav-link { font-size: 0.75rem; padding: 0.3rem 0.5rem; }
   .cart-btn { padding: 0.4rem 0.8rem !important; }
   
@@ -1215,4 +1271,6 @@ a {
   .cart-drawer-content { width: 100%; right: -100%; }
   .product-info h3 { font-size: 1.2rem; }
   .page-container { padding: 6rem 1rem 1rem; }
+  .admin-order-card { padding: 1rem; }
+  .admin-order-card-footer { flex-direction: column; align-items: flex-start; }
 }

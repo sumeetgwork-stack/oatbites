@@ -2,6 +2,8 @@ import { auth } from '@/auth';
 import { getAllOrders, updateOrderStatus } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 async function checkAdmin() {
   const session = await auth();
   if (!session?.user?.email || session.user.email !== process.env.ADMIN_EMAIL) {

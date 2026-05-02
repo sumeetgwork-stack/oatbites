@@ -1,6 +1,7 @@
 import './globals.css';
 import { CartProvider } from '../context/CartContext';
 import { AuthProvider } from '../context/AuthContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import Header from '../components/Header';
 import CartDrawer from '../components/CartDrawer';
 import { ToastProvider } from '../components/Toast';
@@ -31,14 +32,16 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <AuthProvider>
-          <AnalyticsTracker />
-          <CartProvider>
-            <ToastProvider>
-              <Header />
-              <CartDrawer />
-              {children}
-            </ToastProvider>
-          </CartProvider>
+          <LanguageProvider>
+            <AnalyticsTracker />
+            <CartProvider>
+              <ToastProvider>
+                <Header />
+                <CartDrawer />
+                {children}
+              </ToastProvider>
+            </CartProvider>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>
