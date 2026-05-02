@@ -1676,6 +1676,8 @@ a {
     flex-wrap: nowrap;
     gap: 8px;
     height: auto;
+    animation: none !important; /* Remove animation that uses transform */
+    transform: none !important;
   }
   .header-left-col {
     width: auto;
