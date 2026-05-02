@@ -210,7 +210,10 @@ export default function DashboardPage() {
 
               {activeTab === 'addresses' && (
                 <div className="fk-tab-content">
-                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Manage Addresses</h2>
+                  <div className="fk-tab-header">
+                    <h2>Manage Addresses</h2>
+                  </div>
+                  <div className="fk-tab-body" style={{ padding: '32px' }}>
                   
                   {!showAddAddress ? (
                     <button className="fk-add-address-btn" onClick={() => setShowAddAddress(true)}>
@@ -266,7 +269,10 @@ export default function DashboardPage() {
 
               {activeTab === 'orders' && (
                 <div className="fk-tab-content">
-                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>My Orders</h2>
+                  <div className="fk-tab-header">
+                    <h2>My Orders</h2>
+                  </div>
+                  <div className="fk-tab-body" style={{ padding: '32px' }}>
                   {loadingOrders ? <p style={{ padding: '2rem', textAlign: 'center' }}>Loading orders...</p> : orders.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '4rem 0' }}>
                       <p style={{ fontSize: '1.2rem', color: '#878787', marginBottom: '1rem' }}>No orders found.</p>
@@ -297,39 +303,52 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   )}
+                  </div>
                 </div>
               )}
 
               {activeTab === 'giftcards' && (
                 <div className="fk-tab-content">
-                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Gift Cards</h2>
-                  <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎁</div>
-                    <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Gift Cards found</p>
-                    <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You haven't added any gift cards yet.</p>
-                    <button className="fk-save-btn" style={{ display: 'inline-block' }}>ADD A GIFT CARD</button>
+                  <div className="fk-tab-header">
+                    <h2>Gift Cards</h2>
+                  </div>
+                  <div className="fk-tab-body" style={{ padding: '32px' }}>
+                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎁</div>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Gift Cards found</p>
+                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You haven't added any gift cards yet.</p>
+                      <button className="fk-save-btn" style={{ display: 'inline-block' }}>ADD A GIFT CARD</button>
+                    </div>
                   </div>
                 </div>
               )}
 
               {activeTab === 'upi' && (
                 <div className="fk-tab-content">
-                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Saved UPI</h2>
-                  <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
-                    <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved UPI IDs</p>
-                    <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>Save your UPI IDs for faster payments.</p>
+                  <div className="fk-tab-header">
+                    <h2>Saved UPI</h2>
+                  </div>
+                  <div className="fk-tab-body" style={{ padding: '32px' }}>
+                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved UPI IDs</p>
+                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>Save your UPI IDs for faster payments.</p>
+                    </div>
                   </div>
                 </div>
               )}
 
               {activeTab === 'cards' && (
                 <div className="fk-tab-content">
-                  <h2 style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', margin: '-24px -32px 24px', fontSize: '18px' }}>Saved Cards</h2>
-                  <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
-                    <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved Cards</p>
-                    <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You can save your Credit/Debit cards for a seamless checkout experience.</p>
+                  <div className="fk-tab-header">
+                    <h2>Saved Cards</h2>
+                  </div>
+                  <div className="fk-tab-body" style={{ padding: '32px' }}>
+                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved Cards</p>
+                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You can save your Credit/Debit cards for a seamless checkout experience.</p>
+                    </div>
                   </div>
                 </div>
               )}
