@@ -43,12 +43,20 @@ export async function createOrder(orderData) {
 
 export async function getOrdersByUserId(email) {
   const orders = await getCollection('orders');
-  return await orders.find({ userEmail: email }).sort({ createdAt: -1 }).toArray();
+  const result = await orders.find({ userEmail: email }).sort({ createdAt: -1 }).toArray();
+  return result.map(order => ({
+    ...order,
+    id: order.id || order._id.toString()
+  }));
 }
 
 export async function getAllOrders() {
   const orders = await getCollection('orders');
-  return await orders.find({}).sort({ createdAt: -1 }).toArray();
+  const result = await orders.find({}).sort({ createdAt: -1 }).toArray();
+  return result.map(order => ({
+    ...order,
+    id: order.id || order._id.toString()
+  }));
 }
 
 export async function updateOrderStatus(orderId, status) {
@@ -59,8 +67,11 @@ export async function updateOrderStatus(orderId, status) {
   }
   
   // Try finding by custom string ID (id) or MongoDB _id
+  let query = { id: orderId };
+  try { query = { $or: [{ id: orderId }, { _id: new ObjectId(orderId) }] }; } catch(e) {}
+
   const result = await orders.findOneAndUpdate(
-    { $or: [{ id: orderId }, { _id: orderId }] },
+    query,
     { $set: update },
     { returnDocument: 'after' }
   );
@@ -70,8 +81,11 @@ export async function updateOrderStatus(orderId, status) {
 export async function updateOrderPayment(orderId, paymentData) {
   const orders = await getCollection('orders');
   
+  let query = { id: orderId };
+  try { query = { $or: [{ id: orderId }, { _id: new ObjectId(orderId) }] }; } catch(e) {}
+  
   // Find the order first to get the items
-  const order = await orders.findOne({ $or: [{ id: orderId }, { _id: orderId }] });
+  const order = await orders.findOne(query);
   if (!order) return null;
 
   const update = {
@@ -83,7 +97,7 @@ export async function updateOrderPayment(orderId, paymentData) {
   };
   
   const result = await orders.findOneAndUpdate(
-    { $or: [{ id: orderId }, { _id: orderId }] },
+    query,
     { $set: update },
     { returnDocument: 'after' }
   );
