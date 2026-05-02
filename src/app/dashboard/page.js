@@ -84,8 +84,9 @@ export default function DashboardPage() {
   const handleSaveAddress = async (e) => {
     e.preventDefault();
     setSaving(true);
-    const updatedAddresses = [...profile.addresses, { ...newAddress, id: Date.now().toString() }];
     try {
+      const currentAddresses = profile.addresses || [];
+      const updatedAddresses = [...currentAddresses, { ...newAddress, id: Date.now().toString() }];
       const res = await fetch('/api/user/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -96,20 +97,31 @@ export default function DashboardPage() {
         setShowAddAddress(false);
         setNewAddress({ name: '', phone: '', pincode: '', locality: '', address: '', city: '', state: '', type: 'Home' });
         addToast('Address added successfully!', 'success');
+      } else {
+        const d = await res.json();
+        addToast(d.error || 'Failed to save address', 'error');
       }
-    } catch (err) {}
+    } catch (err) {
+      addToast('An error occurred while saving', 'error');
+      console.error(err);
+    }
     setSaving(false);
   };
 
   const handleDeleteAddress = async (id) => {
-    const updatedAddresses = profile.addresses.filter(a => a.id !== id);
+    const currentAddresses = profile.addresses || [];
+    const updatedAddresses = currentAddresses.filter(a => a.id !== id);
     setProfile({ ...profile, addresses: updatedAddresses });
-    await fetch('/api/user/profile', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...profile, addresses: updatedAddresses }),
-    });
-    addToast('Address removed', 'success');
+    try {
+      await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...profile, addresses: updatedAddresses }),
+      });
+      addToast('Address removed', 'success');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (isLoading || !isLoggedIn) return <div className="page-container" style={{paddingTop:'100px', textAlign:'center'}}>Loading...</div>;
