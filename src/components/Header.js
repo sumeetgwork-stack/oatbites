@@ -11,12 +11,18 @@ export default function Header() {
   const { cartCount, setIsCartOpen } = useCart();
   const { user, isLoggedIn, isAdmin } = useAuth();
   const { locale, changeLanguage, t, LANGUAGE_NAMES } = useLanguage();
+  const [userAddresses, setUserAddresses] = useState([]);
+  const [addressOpen, setAddressOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [userAddress, setUserAddress] = useState('');
+  const addressRef = useRef(null);
   const langRef = useRef(null);
 
   useEffect(() => {
     const handleClick = (e) => {
+      if (addressRef.current && !addressRef.current.contains(e.target)) {
+        setAddressOpen(false);
+      }
       if (langRef.current && !langRef.current.contains(e.target)) {
         setLangOpen(false);
       }
@@ -25,41 +31,96 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // Fetch user address for navbar display
+  // Fetch user profile for addresses
   useEffect(() => {
     if (isLoggedIn) {
       fetch('/api/user/profile')
         .then(res => res.json())
         .then(data => {
-          if (data.address) {
-            setUserAddress(data.address);
+          if (data.address) setUserAddress(data.address);
+          if (data.addresses) setUserAddresses(data.addresses);
+          
+          // Set active address from localStorage or default to first one
+          const savedAddrId = localStorage.getItem('activeDeliveryAddressId');
+          if (savedAddrId && data.addresses) {
+            const found = data.addresses.find(a => a.id === savedAddrId);
+            if (found) {
+              const formatted = `${found.address}, ${found.locality}, ${found.city}, ${found.state} - ${found.pincode}`;
+              setUserAddress(formatted);
+            }
           }
         })
         .catch(() => {});
     }
   }, [isLoggedIn]);
 
+  const selectAddress = (addr) => {
+    const formatted = `${addr.address}, ${addr.locality}, ${addr.city}, ${addr.state} - ${addr.pincode}`;
+    setUserAddress(formatted);
+    localStorage.setItem('activeDeliveryAddressId', addr.id);
+    setAddressOpen(false);
+  };
+
   // Extract short address (city or first part)
   const shortAddress = userAddress
-    ? userAddress.split(',').pop()?.trim() || userAddress.slice(0, 20)
+    ? userAddress.split(',').reverse()[1]?.trim() || userAddress.split(',').pop()?.trim() || userAddress.slice(0, 15)
     : '';
 
   return (
-    <header className="header glass-panel">
+    <header className="header">
       <div className="header-left">
         <Link href="/" className="logo">
           OATBITES <span style={{fontWeight: 300}}>BY SEJ</span>
         </Link>
         
-        {/* Amazon-style Address Display */}
+        {/* Amazon-style Address Display & Dropdown */}
         {isLoggedIn && (
-          <Link href="/dashboard" className="nav-address-btn" title={userAddress || 'Set your address'}>
-            <span className="nav-address-icon">📍</span>
-            <div className="nav-address-text">
-              <span className="nav-address-label">{t('deliverTo')}</span>
-              <span className="nav-address-value">{shortAddress || t('setAddress')}</span>
-            </div>
-          </Link>
+          <div className="nav-address-container" ref={addressRef}>
+            <button 
+              className="nav-address-btn" 
+              onClick={() => setAddressOpen(!addressOpen)}
+              title={userAddress || 'Set your address'}
+            >
+              <span className="nav-address-icon">📍</span>
+              <div className="nav-address-text">
+                <span className="nav-address-label">{t('deliverTo')}</span>
+                <span className="nav-address-value">{shortAddress || t('setAddress')}</span>
+              </div>
+            </button>
+
+            {addressOpen && (
+              <div className="address-dropdown glass-panel">
+                <div className="address-dropdown-header">
+                  <h3>Choose your delivery location</h3>
+                  <p>Delivery options and speeds may vary for different locations</p>
+                </div>
+                <div className="address-dropdown-list">
+                  {userAddresses.length > 0 ? (
+                    userAddresses.map((addr) => (
+                      <button 
+                        key={addr.id} 
+                        className={`address-option ${userAddress.includes(addr.pincode) ? 'active' : ''}`}
+                        onClick={() => selectAddress(addr)}
+                      >
+                        <span className="addr-type">{addr.type}</span>
+                        <strong>{addr.name}</strong>
+                        <p>{addr.address}, {addr.locality}</p>
+                        <p>{addr.city}, {addr.state} - {addr.pincode}</p>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="no-address-msg">
+                      <p>No addresses saved.</p>
+                      <Link href="/dashboard" onClick={() => setAddressOpen(false)} className="btn-link">Manage Addresses</Link>
+                    </div>
+                  )}
+                </div>
+                <div className="address-dropdown-footer">
+                  <Link href="/dashboard" onClick={() => setAddressOpen(false)}>Manage address book</Link>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 

@@ -32,10 +32,48 @@ export default function CheckoutPage() {
   }, [isLoggedIn, isLoading, router]);
 
   useEffect(() => {
-    if (!isLoading && isLoggedIn && cart.length === 0) {
-      router.push('/products');
+    if (!isLoading && isLoggedIn) {
+      if (cart.length === 0) {
+        router.push('/products');
+        return;
+      }
+
+      // Auto-detect address
+      fetch('/api/user/profile')
+        .then(res => res.json())
+        .then(data => {
+          const savedAddrId = localStorage.getItem('activeDeliveryAddressId');
+          let selectedAddr = null;
+
+          if (savedAddrId && data.addresses) {
+            selectedAddr = data.addresses.find(a => a.id === savedAddrId);
+          }
+
+          if (!selectedAddr && data.addresses && data.addresses.length > 0) {
+            selectedAddr = data.addresses[0];
+          }
+
+          if (selectedAddr) {
+            setAddress({
+              fullName: selectedAddr.name || user?.name || '',
+              phone: selectedAddr.phone || '',
+              street: `${selectedAddr.address}, ${selectedAddr.locality}`,
+              city: selectedAddr.city || '',
+              state: selectedAddr.state || '',
+              pincode: selectedAddr.pincode || '',
+            });
+          } else if (data.address) {
+            // Fallback to legacy single address string
+            setAddress(prev => ({
+              ...prev,
+              fullName: user?.name || '',
+              street: data.address
+            }));
+          }
+        })
+        .catch(console.error);
     }
-  }, [cart, isLoading, isLoggedIn, router]);
+  }, [cart, isLoading, isLoggedIn, router, user?.name]);
 
   const handlePayment = async () => {
     if (!address.fullName || !address.phone || !address.street || !address.city || !address.state || !address.pincode) {
