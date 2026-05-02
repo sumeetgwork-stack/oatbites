@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from '../../context/CartContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../components/Toast';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import { useEffect, useState } from 'react';
 export default function ProductsPage() {
   const { addToCart, cart, updateQuantity, removeFromCart } = useCart();
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -31,8 +33,8 @@ export default function ProductsPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>All Products</h1>
-        <p>Discover our full range of premium oat-based goods.</p>
+        <h1>{t('allProducts')}</h1>
+        <p>{t('heroSubtitle')}</p>
       </div>
 
       <div className="product-grid page-grid">
@@ -69,11 +71,11 @@ export default function ProductsPage() {
                           <span>{cartItem.quantity}</span>
                           <button onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}>+</button>
                         </div>
-                        <span className="in-cart-label">In Cart</span>
+                        <span className="in-cart-label">{t('inCart')}</span>
                       </div>
                     ) : (
                       <button className="btn-secondary" onClick={() => handleAddToCart(product)}>
-                        Add to Cart
+                        {t('addToCart')}
                       </button>
                     )}
                   </div>
@@ -84,10 +86,10 @@ export default function ProductsPage() {
                     <p>{product.description || 'Premium organic oat product crafted with the finest ingredients for your health and taste.'}</p>
                     {!cartItem ? (
                       <button className="btn-primary" style={{ background: 'white', color: '#333' }} onClick={() => handleAddToCart(product)}>
-                        Add to Cart
+                        {t('addToCart')}
                       </button>
                     ) : (
-                      <span className="in-cart-label" style={{ color: 'white', border: '1px solid white' }}>✓ In Cart ({cartItem.quantity})</span>
+                      <span className="in-cart-label" style={{ color: 'white', border: '1px solid white' }}>✓ {t('inCart')} ({cartItem.quantity})</span>
                     )}
                   </div>
                 </div>

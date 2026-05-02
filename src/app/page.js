@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '../components/Toast';
 import { useEffect, useState } from 'react';
 
@@ -11,6 +12,7 @@ const Scene = dynamic(() => import('../components/Scene'), { ssr: false });
 export default function Home() {
   const { addToCart, cart, updateQuantity, removeFromCart } = useCart();
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -37,16 +39,16 @@ export default function Home() {
       <div className="content-layer">
         <section className="hero-section">
           <div className="glass-panel hero-card">
-            <h1 className="hero-title">Healthy & <br/> Delicious.</h1>
+            <h1 className="hero-title">{t('heroTitle')} <br/> {t('heroTitle2')}</h1>
             <p className="hero-subtitle">
-              Experience the crunch. Premium oatbites crafted with love, care, and the finest organic ingredients.
+              {t('heroSubtitle')}
             </p>
-            <Link href="/products" className="btn-primary">Shop Now</Link>
+            <Link href="/products" className="btn-primary">{t('shopNow')}</Link>
           </div>
         </section>
 
         <section className="featured-section glass-panel">
-          <h2 className="section-title">Featured Oatbites</h2>
+          <h2 className="section-title">{t('featuredOatbites')}</h2>
           <div className="product-grid">
             {products.map((product) => {
               const cartItem = getCartItem(product.id);
@@ -76,10 +78,10 @@ export default function Home() {
                           <span>{cartItem.quantity}</span>
                           <button onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}>+</button>
                         </div>
-                        <span className="in-cart-label">In Cart</span>
+                        <span className="in-cart-label">{t('inCart')}</span>
                       </div>
                     ) : (
-                      <button className="btn-secondary" onClick={() => handleAddToCart(product)}>Add to Cart</button>
+                      <button className="btn-secondary" onClick={() => handleAddToCart(product)}>{t('addToCart')}</button>
                     )}
                   </div>
                 </div>
@@ -87,12 +89,12 @@ export default function Home() {
             })}
           </div>
           <div className="view-all-container">
-            <Link href="/products" className="btn-outline">View All Products</Link>
+            <Link href="/products" className="btn-outline">{t('viewAllProducts')}</Link>
           </div>
         </section>
 
         <footer className="footer">
-          <p>© 2026 Oatbites by SEJ. All rights reserved.</p>
+          <p>{t('copyright')}</p>
         </footer>
       </div>
     </main>

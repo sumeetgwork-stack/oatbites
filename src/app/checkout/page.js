@@ -2,6 +2,7 @@
 
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Script from 'next/script';
@@ -12,6 +13,7 @@ const Scene = dynamic(() => import('../../components/Scene'), { ssr: false });
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
   const { user, isLoggedIn, isLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const [address, setAddress] = useState({
     fullName: '',
@@ -133,20 +135,20 @@ export default function CheckoutPage() {
             <div className="checkout-layout">
               {/* Shipping Form */}
               <div className="checkout-form glass-panel">
-                <h2>Shipping Details</h2>
+                <h2>{t('shippingDetails')}</h2>
                 <div className="form-grid">
                   <label className="form-field">
-                    <span>Full Name</span>
+                    <span>{t('fullName')}</span>
                     <input 
                       type="text" 
                       value={address.fullName}
                       onChange={e => setAddress({...address, fullName: e.target.value})}
-                      placeholder="Your full name"
+                      placeholder={t('fullName')}
                       required
                     />
                   </label>
                   <label className="form-field">
-                    <span>Phone Number</span>
+                    <span>{t('phone')}</span>
                     <input 
                       type="tel" 
                       value={address.phone}
@@ -156,37 +158,37 @@ export default function CheckoutPage() {
                     />
                   </label>
                   <label className="form-field full-width">
-                    <span>Street Address</span>
+                    <span>{t('streetAddress')}</span>
                     <input 
                       type="text" 
                       value={address.street}
                       onChange={e => setAddress({...address, street: e.target.value})}
-                      placeholder="House No., Street, Locality"
+                      placeholder={t('streetAddress')}
                       required
                     />
                   </label>
                   <label className="form-field">
-                    <span>City</span>
+                    <span>{t('city')}</span>
                     <input 
                       type="text" 
                       value={address.city}
                       onChange={e => setAddress({...address, city: e.target.value})}
-                      placeholder="City"
+                      placeholder={t('city')}
                       required
                     />
                   </label>
                   <label className="form-field">
-                    <span>State</span>
+                    <span>{t('state')}</span>
                     <input 
                       type="text" 
                       value={address.state}
                       onChange={e => setAddress({...address, state: e.target.value})}
-                      placeholder="State"
+                      placeholder={t('state')}
                       required
                     />
                   </label>
                   <label className="form-field">
-                    <span>Pincode</span>
+                    <span>{t('pincode')}</span>
                     <input 
                       type="text" 
                       value={address.pincode}
@@ -200,7 +202,7 @@ export default function CheckoutPage() {
 
               {/* Order Summary */}
               <div className="checkout-summary glass-panel">
-                <h2>Order Summary</h2>
+                <h2>{t('orderSummary')}</h2>
                 <div className="checkout-items">
                   {cart.map(item => (
                     <div key={item.id} className="checkout-item">
@@ -217,16 +219,16 @@ export default function CheckoutPage() {
                 </div>
                 <div className="checkout-divider"></div>
                 <div className="checkout-total-row">
-                  <span>Subtotal</span>
+                  <span>{t('subtotal')}</span>
                   <span>₹{cartTotal.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="checkout-total-row">
-                  <span>Shipping</span>
-                  <span style={{ color: '#27ae60' }}>Free</span>
+                  <span>{t('shipping')}</span>
+                  <span style={{ color: '#27ae60' }}>{t('free')}</span>
                 </div>
                 <div className="checkout-divider"></div>
                 <div className="checkout-total-row grand-total">
-                  <span>Total</span>
+                  <span>{t('total')}</span>
                   <span>₹{cartTotal.toLocaleString('en-IN')}</span>
                 </div>
                 <button 
@@ -234,7 +236,7 @@ export default function CheckoutPage() {
                   onClick={handlePayment}
                   disabled={processing}
                 >
-                  {processing ? 'Processing...' : `Pay ₹${cartTotal.toLocaleString('en-IN')} with Razorpay`}
+                  {processing ? 'Processing...' : `${t('payNow')} ₹${cartTotal.toLocaleString('en-IN')}`}
                 </button>
               </div>
             </div>
