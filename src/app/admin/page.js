@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const { user, isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState(null);
+  const [lowStockProducts, setLowStockProducts] = useState([]);
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
@@ -30,6 +31,15 @@ export default function AdminDashboard() {
         .then(data => {
           console.log('Admin Stats Data:', data);
           setStats(data);
+        })
+        .catch(console.error);
+
+      // Fetch products for low stock alert
+      fetch('/api/admin/products')
+        .then(res => res.json())
+        .then(data => {
+          const products = data.products || [];
+          setLowStockProducts(products.filter(p => p.stock !== undefined && p.stock <= 5));
         })
         .catch(console.error);
     }
@@ -81,6 +91,36 @@ export default function AdminDashboard() {
               <p style={{ fontSize: '0.9rem' }}>View and update the status of customer orders</p>
             </Link>
           </div>
+
+          {/* Low Stock Alerts */}
+          {lowStockProducts.length > 0 && (
+            <div style={{ marginBottom: '1.5rem', background: '#fff', borderRadius: '12px', border: '2px solid #fde8e8', overflow: 'hidden' }}>
+              <div style={{ background: 'linear-gradient(135deg, #d32f2f, #c62828)', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: '1rem' }}>🚨 Inventory Alerts — {lowStockProducts.length} product{lowStockProducts.length > 1 ? 's' : ''} need attention</h3>
+                <Link href="/admin/products" style={{ color: '#ffcdd2', fontSize: '0.85rem', textDecoration: 'none' }}>View All →</Link>
+              </div>
+              <div style={{ padding: '16px', display: 'grid', gap: '10px' }}>
+                {lowStockProducts.map(p => (
+                  <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: '8px', background: p.stock <= 0 ? '#fde8e8' : '#fff3e0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {p.image && <img src={p.image} alt="" style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />}
+                      <div>
+                        <strong style={{ fontSize: '0.9rem' }}>{p.name}</strong>
+                        <span style={{ marginLeft: '8px', fontSize: '0.8rem', color: '#888' }}>{p.category}</span>
+                      </div>
+                    </div>
+                    <span style={{
+                      padding: '4px 12px', borderRadius: '4px', fontWeight: '700', fontSize: '12px',
+                      background: p.stock <= 0 ? '#d32f2f' : '#e65100',
+                      color: '#fff',
+                    }}>
+                      {p.stock <= 0 ? 'OUT OF STOCK' : `${p.stock} left`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="analytics-visuals" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1rem' }}>
             <div style={{ padding: '1.5rem', height: '300px', background: '#fff', borderRadius: '12px', border: '1px solid #eaeaea' }}>

@@ -1,5 +1,7 @@
 import { auth } from '@/auth';
 import { updateOrderPayment } from '@/lib/db';
+import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendPushToUser, orderConfirmationPush } from '@/lib/push';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
@@ -31,6 +33,10 @@ export async function POST(req) {
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
+
+    // Send order confirmation email and push notification (async, non-blocking)
+    sendOrderConfirmationEmail(order).catch(err => console.error('[Email] Background send failed:', err));
+    sendPushToUser(session.user.email, orderConfirmationPush(order)).catch(err => console.error('[Push] Background send failed:', err));
 
     return NextResponse.json({ success: true, order });
   } catch (error) {

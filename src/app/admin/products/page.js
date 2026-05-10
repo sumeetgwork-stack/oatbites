@@ -115,7 +115,15 @@ export default function AdminProductsPage() {
                   {p.featured && <span style={{ color: '#f59e0b', marginLeft: '0.5rem', fontSize: '1.2rem' }} title="Featured on Homepage">★</span>}
                 </td>
                 <td>{p.category}</td>
-                <td>{p.stock}</td>
+                <td>
+                  {p.stock <= 0 ? (
+                    <span style={{ background: '#fde8e8', color: '#d32f2f', padding: '4px 10px', borderRadius: '4px', fontWeight: '700', fontSize: '12px' }}>OUT OF STOCK</span>
+                  ) : p.stock <= 5 ? (
+                    <span style={{ background: '#fff3e0', color: '#e65100', padding: '4px 10px', borderRadius: '4px', fontWeight: '700', fontSize: '12px' }}>⚠️ {p.stock} — LOW</span>
+                  ) : (
+                    <span style={{ color: '#388e3c', fontWeight: '600' }}>{p.stock}</span>
+                  )}
+                </td>
                 <td>₹{p.price.toLocaleString('en-IN')}</td>
                 <td>
                   <button className="action-btn edit" onClick={() => openEdit(p)}>Edit</button>

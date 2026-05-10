@@ -154,6 +154,7 @@ export default function DashboardPage() {
                   <h3><span className="fk-icon">👤</span> ACCOUNT SETTINGS</h3>
                   <button onClick={() => setActiveTab('profile')} className={`fk-nav-subbtn ${activeTab === 'profile' ? 'active' : ''}`}>Profile Information</button>
                   <button onClick={() => setActiveTab('addresses')} className={`fk-nav-subbtn ${activeTab === 'addresses' ? 'active' : ''}`}>Manage Addresses</button>
+                  <button onClick={() => setActiveTab('notifications')} className={`fk-nav-subbtn ${activeTab === 'notifications' ? 'active' : ''}`}>Notifications</button>
                 </div>
 
                 <div className="fk-nav-group">
@@ -267,6 +268,36 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+
+              {activeTab === 'notifications' && (
+                <div className="fk-tab-content">
+                  <div className="fk-tab-header">
+                    <h2>Push Notifications</h2>
+                  </div>
+                  <div className="fk-tab-body" style={{ padding: '32px' }}>
+                    <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔔</div>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>Stay Updated!</p>
+                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                        Get instant alerts for order shipping updates and when your favorite out-of-stock items are back.
+                      </p>
+                      <button 
+                        className="fk-save-btn" 
+                        style={{ display: 'inline-block' }}
+                        onClick={() => {
+                          if (typeof window !== 'undefined' && window.requestPushPermission) {
+                            window.requestPushPermission();
+                          } else {
+                            addToast('Please enable notifications in your browser settings.', 'info');
+                          }
+                        }}
+                      >
+                        ENABLE NOTIFICATIONS
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {activeTab === 'orders' && (
                 <div className="fk-tab-content">

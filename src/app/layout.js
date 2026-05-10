@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import CartDrawer from '../components/CartDrawer';
 import { ToastProvider } from '../components/Toast';
 import AnalyticsTracker from '../components/AnalyticsTracker';
+import PushNotificationManager from '../components/PushNotificationManager';
 
 export const metadata = {
   title: 'Oatbites by SEJ | Premium Oat Products',
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
             <AnalyticsTracker />
             <CartProvider>
               <ToastProvider>
+                <PushNotificationManager />
                 <Header />
                 <CartDrawer />
                 {children}

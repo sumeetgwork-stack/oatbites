@@ -1,4 +1,6 @@
-import { getAllProducts, addProduct, updateProduct, deleteProduct } from '@/lib/db';
+import { getAllProducts, addProduct, updateProduct, deleteProduct, getRestockSubscribers, clearRestockSubscribers } from '@/lib/db';
+import { sendBackInStockEmail } from '@/lib/email';
+import { sendPushToUser, backInStockPush } from '@/lib/push';
 import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 
@@ -28,7 +30,34 @@ export async function PUT(req) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const body = await req.json();
   const { id, ...updates } = body;
+
+  // Check if product was out of stock before update
+  const allProducts = await getAllProducts();
+  const oldProduct = allProducts.find(p => p.id === id);
+  const wasOutOfStock = oldProduct && oldProduct.stock !== undefined && oldProduct.stock <= 0;
+  const isNowInStock = updates.stock !== undefined && Number(updates.stock) > 0;
+
   const product = await updateProduct(id, updates);
+
+  // If restocked, notify all subscribers
+  if (wasOutOfStock && isNowInStock && product) {
+    const subscribers = await getRestockSubscribers(id);
+    if (subscribers.length > 0) {
+      console.log(`[Restock] Notifying ${subscribers.length} subscriber(s) for ${product.name}`);
+      const productData = { ...product, id };
+      for (const sub of subscribers) {
+        sendBackInStockEmail(sub.userEmail, productData).catch(err =>
+          console.error(`[Restock] Failed to email ${sub.userEmail}:`, err)
+        );
+        sendPushToUser(sub.userEmail, backInStockPush(productData)).catch(err =>
+          console.error(`[Push] Failed to notify ${sub.userEmail}:`, err)
+        );
+      }
+      // Clear subscriptions after notifying
+      await clearRestockSubscribers(id);
+    }
+  }
+
   return NextResponse.json({ product });
 }
 

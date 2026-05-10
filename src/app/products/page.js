@@ -3,6 +3,7 @@
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../components/Toast';
+import { RatingDisplay } from '../../components/StarRating';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -11,6 +12,7 @@ export default function ProductsPage() {
   const { addToast } = useToast();
   const { t } = useLanguage();
   const [products, setProducts] = useState([]);
+  const [ratings, setRatings] = useState({});
 
   useEffect(() => {
     fetch('/api/admin/products')
@@ -21,9 +23,19 @@ export default function ProductsPage() {
           setProducts(mod.products || []);
         });
       });
+
+    // Fetch all product ratings
+    fetch('/api/reviews?allRatings=true')
+      .then(res => res.json())
+      .then(data => setRatings(data.ratings || {}))
+      .catch(() => {});
   }, []);
 
   const handleAddToCart = (product) => {
+    if (product.stock !== undefined && product.stock <= 0) {
+      addToast('This product is currently out of stock', 'error');
+      return;
+    }
     addToCart(product);
     addToast(`${product.name} added to cart!`, 'success');
   };
@@ -40,24 +52,41 @@ export default function ProductsPage() {
       <div className="product-grid page-grid">
         {products.map((product) => {
           const cartItem = getCartItem(product.id);
+          const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+          const isLowStock = product.stock !== undefined && product.stock > 0 && product.stock <= 5;
+          const productRating = ratings[product.id];
+
           return (
-            <div key={product.id} className="product-card flip-card">
+            <div key={product.id} className={`product-card flip-card ${isOutOfStock ? 'out-of-stock-card' : ''}`}>
               <div className="flip-card-inner">
                 <div className="flip-card-front">
                   <Link href={`/products/${product.id}`} className="product-image-link">
-                    {product.image ? (
-                      <img src={product.image} alt={product.name} className="product-image-placeholder" style={{ objectFit: 'cover' }} />
-                    ) : (
-                      <div className="product-image-placeholder" style={{ backgroundColor: product.color }}></div>
-                    )}
+                    <div style={{ position: 'relative' }}>
+                      {product.image ? (
+                        <img src={product.image} alt={product.name} className="product-image-placeholder" style={{ objectFit: 'cover' }} />
+                      ) : (
+                        <div className="product-image-placeholder" style={{ backgroundColor: product.color }}></div>
+                      )}
+                      {isOutOfStock && (
+                        <div className="stock-overlay-badge out-of-stock">OUT OF STOCK</div>
+                      )}
+                      {isLowStock && (
+                        <div className="stock-overlay-badge low-stock">Only {product.stock} left!</div>
+                      )}
+                    </div>
                   </Link>
                   <div className="product-info">
                     <Link href={`/products/${product.id}`} className="product-name-link">
                       <h3>{product.name}</h3>
                     </Link>
                     <p className="category">{product.category}</p>
+                    {productRating && (
+                      <RatingDisplay avgRating={productRating.avgRating} reviewCount={productRating.count} />
+                    )}
                     <p className="price">₹{product.price?.toLocaleString('en-IN')}</p>
-                    {cartItem ? (
+                    {isOutOfStock ? (
+                      <button className="btn-secondary disabled" disabled>Out of Stock</button>
+                    ) : cartItem ? (
                       <div className="product-actions">
                         <div className="qty-controls">
                           <button onClick={() => {
@@ -84,7 +113,9 @@ export default function ProductsPage() {
                   <div className="flip-card-back-content">
                     <h3>{product.name}</h3>
                     <p>{product.description || 'Premium organic oat product crafted with the finest ingredients for your health and taste.'}</p>
-                    {!cartItem ? (
+                    {isOutOfStock ? (
+                      <span className="in-cart-label" style={{ color: 'white', border: '1px solid white' }}>Out of Stock</span>
+                    ) : !cartItem ? (
                       <button className="btn-primary" style={{ background: 'white', color: '#333' }} onClick={() => handleAddToCart(product)}>
                         {t('addToCart')}
                       </button>

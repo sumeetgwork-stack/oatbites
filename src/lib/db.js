@@ -2,7 +2,7 @@ import clientPromise from './mongodb';
 import { ObjectId } from 'mongodb';
 
 // Helper to get collection
-async function getCollection(collectionName) {
+export async function getCollection(collectionName) {
   const client = await clientPromise;
   const db = client.db();
   return db.collection(collectionName);
@@ -249,3 +249,126 @@ export async function getAnalyticsStats() {
 // Legacy helpers (can be removed later)
 export function readJSON(filename) { return []; }
 export function writeJSON(filename, data) { return true; }
+
+// ==========================================
+// REVIEW HELPERS
+// ==========================================
+
+export async function createReview(reviewData) {
+  const reviews = await getCollection('reviews');
+  // Check if user already reviewed this product
+  const existing = await reviews.findOne({
+    productId: reviewData.productId,
+    userEmail: reviewData.userEmail,
+  });
+  if (existing) {
+    // Update existing review
+    const result = await reviews.findOneAndUpdate(
+      { _id: existing._id },
+      { $set: { rating: reviewData.rating, comment: reviewData.comment, updatedAt: new Date().toISOString() } },
+      { returnDocument: 'after' }
+    );
+    return result;
+  }
+  const newReview = {
+    ...reviewData,
+    createdAt: new Date().toISOString(),
+  };
+  const result = await reviews.insertOne(newReview);
+  return { ...newReview, _id: result.insertedId };
+}
+
+export async function getReviewsByProductId(productId) {
+  const reviews = await getCollection('reviews');
+  return await reviews.find({ productId }).sort({ createdAt: -1 }).toArray();
+}
+
+export async function getAverageRating(productId) {
+  const reviews = await getCollection('reviews');
+  const pipeline = [
+    { $match: { productId } },
+    { $group: { _id: null, avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
+  ];
+  const result = await pipeline.length ? await reviews.aggregate(pipeline).toArray() : [];
+  if (result.length === 0) return { avgRating: 0, count: 0 };
+  return { avgRating: Math.round(result[0].avgRating * 10) / 10, count: result[0].count };
+}
+
+export async function getAllProductRatings() {
+  const reviews = await getCollection('reviews');
+  const pipeline = [
+    { $group: { _id: '$productId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
+  ];
+  const result = await reviews.aggregate(pipeline).toArray();
+  const map = {};
+  result.forEach(r => {
+    map[r._id] = { avgRating: Math.round(r.avgRating * 10) / 10, count: r.count };
+  });
+  return map;
+}
+
+export async function deleteReview(reviewId) {
+  const reviews = await getCollection('reviews');
+  await reviews.deleteOne({ _id: new ObjectId(reviewId) });
+  return true;
+}
+
+export async function hasUserPurchasedProduct(email, productId) {
+  const orders = await getCollection('orders');
+  const order = await orders.findOne({
+    userEmail: email,
+    status: { $in: ['Paid', 'Processing', 'Shipped', 'Delivered'] },
+    'items.id': productId,
+  });
+  return !!order;
+}
+
+// ==========================================
+// SMART INVENTORY HELPERS
+// ==========================================
+
+export async function getLowStockProducts(threshold = 5) {
+  const products = await getCollection('products');
+  return await products.find({ stock: { $lte: threshold } }).toArray();
+}
+
+export async function getOutOfStockProducts() {
+  const products = await getCollection('products');
+  return await products.find({ stock: { $lte: 0 } }).toArray();
+}
+
+// ==========================================
+// BACK-IN-STOCK NOTIFICATION HELPERS
+// ==========================================
+
+export async function subscribeToRestock(productId, userEmail) {
+  const notifications = await getCollection('stock_notifications');
+  const existing = await notifications.findOne({ productId, userEmail });
+  if (existing) return existing;
+  const doc = { productId, userEmail, createdAt: new Date().toISOString() };
+  const result = await notifications.insertOne(doc);
+  return { ...doc, _id: result.insertedId };
+}
+
+export async function unsubscribeFromRestock(productId, userEmail) {
+  const notifications = await getCollection('stock_notifications');
+  await notifications.deleteOne({ productId, userEmail });
+  return true;
+}
+
+export async function isSubscribedToRestock(productId, userEmail) {
+  const notifications = await getCollection('stock_notifications');
+  const doc = await notifications.findOne({ productId, userEmail });
+  return !!doc;
+}
+
+export async function getRestockSubscribers(productId) {
+  const notifications = await getCollection('stock_notifications');
+  return await notifications.find({ productId }).toArray();
+}
+
+export async function clearRestockSubscribers(productId) {
+  const notifications = await getCollection('stock_notifications');
+  const result = await notifications.deleteMany({ productId });
+  return result.deletedCount;
+}
