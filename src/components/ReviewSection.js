@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useToast } from './Toast';
 
 export default function ReviewSection({ productId }) {
   const { user, isLoggedIn } = useAuth();
+  const { t } = useLanguage();
   const { addToast } = useToast();
   const [reviews, setReviews] = useState([]);
   const [avgRating, setAvgRating] = useState(0);
@@ -47,7 +49,7 @@ export default function ReviewSection({ productId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (rating === 0) {
-      addToast('Please select a rating', 'error');
+      addToast(t('pleaseSelectRating'), 'error');
       return;
     }
     setSubmitting(true);
@@ -59,14 +61,14 @@ export default function ReviewSection({ productId }) {
       });
       const data = await res.json();
       if (res.ok) {
-        addToast(data.message || 'Review submitted!', 'success');
+        addToast(data.message || t('submitReview'), 'success');
         setShowForm(false);
         fetchReviews();
       } else {
-        addToast(data.error || 'Failed to submit review', 'error');
+        addToast(data.error || t('somethingWentWrong'), 'error');
       }
     } catch (err) {
-      addToast('Failed to submit review', 'error');
+      addToast(t('somethingWentWrong'), 'error');
     }
     setSubmitting(false);
   };
@@ -81,20 +83,20 @@ export default function ReviewSection({ productId }) {
     return `${Math.floor(days / 365)} years ago`;
   };
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>Loading reviews...</div>;
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>{t('loadingReviews')}</div>;
 
   return (
     <div className="review-section">
       {/* Header */}
       <div className="review-header">
         <div className="review-summary">
-          <h2>Ratings & Reviews</h2>
+          <h2>{t('ratingsReviews')}</h2>
           {reviewCount > 0 && (
             <div className="review-overview">
               <div className="review-avg-big">
                 <span className="review-avg-number">{avgRating}</span>
                 <StarRating rating={avgRating} readOnly size={20} />
-                <span className="review-count-text">{reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}</span>
+                <span className="review-count-text">{reviewCount} {reviewCount === 1 ? t('review') : t('reviews')}</span>
               </div>
             </div>
           )}
@@ -104,7 +106,7 @@ export default function ReviewSection({ productId }) {
             className="btn-primary review-write-btn"
             onClick={() => setShowForm(!showForm)}
           >
-            {userReview ? '✏️ Edit Review' : '✍️ Write a Review'}
+            {userReview ? t('editReview') : t('writeReview')}
           </button>
         )}
       </div>
@@ -113,11 +115,11 @@ export default function ReviewSection({ productId }) {
       {showForm && (
         <form className="review-form" onSubmit={handleSubmit}>
           <div className="review-form-rating">
-            <label>Your Rating:</label>
+            <label>{t('yourRating')}</label>
             <StarRating rating={rating} onRate={setRating} size={32} />
           </div>
           <textarea
-            placeholder="Share your experience with this product... (optional)"
+            placeholder={t('reviewPlaceholder')}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={4}
@@ -125,9 +127,9 @@ export default function ReviewSection({ productId }) {
           />
           <div className="review-form-actions">
             <button type="submit" className="btn-primary" disabled={submitting}>
-              {submitting ? 'Submitting...' : userReview ? 'Update Review' : 'Submit Review'}
+              {submitting ? t('submitting') : userReview ? t('updateReview') : t('submitReview')}
             </button>
-            <button type="button" className="btn-outline" onClick={() => setShowForm(false)}>Cancel</button>
+            <button type="button" className="btn-outline" onClick={() => setShowForm(false)}>{t('cancel')}</button>
           </div>
         </form>
       )}
@@ -135,19 +137,19 @@ export default function ReviewSection({ productId }) {
       {/* Not logged in or hasn't purchased */}
       {!isLoggedIn && (
         <p className="review-login-prompt">
-          <a href="/login">Sign in</a> to write a review after purchasing this product.
+          <a href="/login">{t('signIn')}</a> {t('signInToReview')}
         </p>
       )}
       {isLoggedIn && !canReview && !userReview && (
         <p className="review-purchase-prompt">
-          ℹ️ Purchase this product to leave a review.
+          ℹ️ {t('purchaseToReview')}
         </p>
       )}
 
       {/* Reviews list */}
       {reviews.length === 0 ? (
         <div className="review-empty">
-          <p>No reviews yet. Be the first to review this product!</p>
+          <p>{t('noReviews')}</p>
         </div>
       ) : (
         <div className="review-list">
@@ -164,7 +166,7 @@ export default function ReviewSection({ productId }) {
                   )}
                   <div>
                     <strong className="review-user-name">{review.userName}</strong>
-                    {review.userEmail === user?.email && <span className="review-you-badge">You</span>}
+                    {review.userEmail === user?.email && <span className="review-you-badge">{t('you')}</span>}
                     <span className="review-date">{timeAgo(review.createdAt)}</span>
                   </div>
                 </div>

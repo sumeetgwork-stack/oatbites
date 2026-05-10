@@ -2,6 +2,7 @@
 
 import { useCart } from '../../../context/CartContext';
 import { useAuth } from '../../../context/AuthContext';
+import { useLanguage } from '../../../context/LanguageContext';
 import { useToast } from '../../../components/Toast';
 import ReviewSection from '../../../components/ReviewSection';
 import Link from 'next/link';
@@ -12,6 +13,7 @@ export default function ProductDetailsPage({ params }) {
   const { addToCart } = useCart();
   const { addToast } = useToast();
   const { isLoggedIn } = useAuth();
+  const { t } = useLanguage();
   const resolvedParams = use(params);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ export default function ProductDetailsPage({ params }) {
 
   const handleNotifyMe = async () => {
     if (!isLoggedIn) {
-      addToast('Please login to get notified', 'error');
+      addToast(t('loginToNotify'), 'error');
       return;
     }
     setNotifyLoading(true);
@@ -55,7 +57,7 @@ export default function ProductDetailsPage({ params }) {
           body: JSON.stringify({ productId: product.id }),
         });
         setNotifySubscribed(false);
-        addToast('Notification removed', 'info');
+        addToast(t('notificationRemoved'), 'info');
       } else {
         // Subscribe
         const res = await fetch('/api/notifications/stock', {
@@ -66,19 +68,19 @@ export default function ProductDetailsPage({ params }) {
         const data = await res.json();
         if (res.ok) {
           setNotifySubscribed(true);
-          addToast(data.message || 'You will be notified!', 'success');
+          addToast(data.message || t('youllBeNotified'), 'success');
         } else {
-          addToast(data.error || 'Failed to subscribe', 'error');
+          addToast(data.error || t('somethingWentWrong'), 'error');
         }
       }
     } catch {
-      addToast('Something went wrong', 'error');
+      addToast(t('somethingWentWrong'), 'error');
     }
     setNotifyLoading(false);
   };
 
   if (loading) {
-    return <div className="page-container"><p style={{ textAlign: 'center', padding: '4rem' }}>Loading...</p></div>;
+    return <div className="page-container"><p style={{ textAlign: 'center', padding: '4rem' }}>{t('loading')}</p></div>;
   }
 
   if (!product) {
@@ -90,11 +92,11 @@ export default function ProductDetailsPage({ params }) {
 
   const handleAdd = () => {
     if (isOutOfStock) {
-      addToast('This product is currently out of stock', 'error');
+      addToast(t('outOfStock'), 'error');
       return;
     }
     for (let i = 0; i < qty; i++) addToCart(product);
-    addToast(`${qty}x ${product.name} added to cart!`, 'success');
+    addToast(`${qty}x ${product.name} ${t('addToCart')}!`, 'success');
   };
 
   return (
@@ -102,7 +104,7 @@ export default function ProductDetailsPage({ params }) {
       <div className="product-details-grid">
         <div className="image-column">
           <Link href="/products" className="back-link" style={{ marginBottom: '1rem', display: 'inline-block' }}>
-            &larr; Back to Products
+            {t('backToProducts')}
           </Link>
           <div style={{ position: 'relative' }}>
             {product.image ? (
@@ -111,7 +113,7 @@ export default function ProductDetailsPage({ params }) {
               <div className="product-details-image" style={{ backgroundColor: product.color }}></div>
             )}
             {isOutOfStock && (
-              <div className="stock-overlay-badge out-of-stock">OUT OF STOCK</div>
+              <div className="stock-overlay-badge out-of-stock">{t('outOfStock').toUpperCase()}</div>
             )}
           </div>
         </div>
@@ -124,17 +126,17 @@ export default function ProductDetailsPage({ params }) {
           {/* Stock indicator */}
           {isOutOfStock && (
             <div className="stock-badge stock-out">
-              <span>●</span> Out of Stock
+              <span>●</span> {t('outOfStock')}
             </div>
           )}
           {isLowStock && (
             <div className="stock-badge stock-low">
-              <span>●</span> Only {product.stock} left — Hurry!
+              <span>●</span> {t('lowStock').replace('{n}', product.stock)}
             </div>
           )}
           {product.stock > 5 && (
             <div className="stock-badge stock-in">
-              <span>●</span> In Stock
+              <span>●</span> {t('inStock')}
             </div>
           )}
 
@@ -149,7 +151,7 @@ export default function ProductDetailsPage({ params }) {
                 onClick={handleNotifyMe}
                 disabled={notifyLoading}
               >
-                {notifyLoading ? '...' : notifySubscribed ? '🔔 You\'ll Be Notified' : '🔔 Notify Me When Available'}
+                {notifyLoading ? '...' : notifySubscribed ? t('youllBeNotified') : t('notifyMe')}
               </button>
             </div>
           ) : (
@@ -160,17 +162,17 @@ export default function ProductDetailsPage({ params }) {
                 <button onClick={() => setQty(qty + 1)}>+</button>
               </div>
               <button className="btn-primary add-to-cart-large" onClick={handleAdd}>
-                Add to Cart
+                {t('addToCart')}
               </button>
             </div>
           )}
           
           <div className="benefits">
-            <h4>Why you&apos;ll love it:</h4>
+            <h4>{t('whyYoullLoveIt')}</h4>
             <ul>
-              <li>100% Organic Ingredients</li>
-              <li>Sustainably Sourced</li>
-              <li>No Artificial Preservatives</li>
+              <li>{t('organicIngredients')}</li>
+              <li>{t('sustainablySourced')}</li>
+              <li>{t('noPreservatives')}</li>
             </ul>
           </div>
         </div>

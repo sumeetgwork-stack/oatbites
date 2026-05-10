@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Scene = dynamic(() => import('../../components/Scene'), { ssr: false });
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('id');
+  const { t } = useLanguage();
 
   return (
     <main className="main-wrapper">
@@ -18,23 +20,22 @@ function ConfirmationContent() {
         <div className="confirmation-page">
           <div className="confirmation-card glass-panel">
             <div className="confirmation-icon">✓</div>
-            <h1>Order Confirmed!</h1>
+            <h1>{t('orderConfirmed')}</h1>
             <p className="confirmation-subtitle">
-              Thank you for shopping with Oatbites by SEJ
+              {t('thankYou')}
             </p>
             {orderId && (
               <div className="order-id-box">
-                <span>Order ID</span>
+                <span>{t('orderId')}</span>
                 <strong>{orderId}</strong>
               </div>
             )}
             <p className="confirmation-text">
-              We&apos;ve received your order and are preparing it with care. 
-              You can track your order status from your dashboard.
+              {t('orderReceivedMsg')}
             </p>
             <div className="confirmation-actions">
-              <Link href="/dashboard" className="btn-primary">View My Orders</Link>
-              <Link href="/products" className="btn-outline">Continue Shopping</Link>
+              <Link href="/dashboard" className="btn-primary">{t('viewMyOrders')}</Link>
+              <Link href="/products" className="btn-outline">{t('continueShopping')}</Link>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useToast } from './Toast';
 
 function urlBase64ToUint8Array(base64String) {
@@ -21,6 +22,7 @@ function urlBase64ToUint8Array(base64String) {
 
 export default function PushNotificationManager() {
   const { isLoggedIn } = useAuth();
+  const { t } = useLanguage();
   const { addToast } = useToast();
   const [permission, setPermission] = useState('default');
 
@@ -99,7 +101,7 @@ export default function PushNotificationManager() {
       const result = await Notification.requestPermission();
       setPermission(result);
       if (result === 'granted') {
-        addToast('Notifications enabled!', 'success');
+        addToast(t('notificationsEnabled'), 'success');
         if (isLoggedIn) {
           subscribeUser();
         }
@@ -119,10 +121,10 @@ export default function PushNotificationManager() {
   if (isLoggedIn && permission === 'default' && !isDismissed) {
     return (
       <div className="push-prompt">
-        <p>Enable notifications for order updates and back-in-stock alerts?</p>
+        <p>{t('enableNotifPrompt')}</p>
         <div className="push-actions">
-          <button onClick={requestPermission} className="btn-primary push-btn">Enable</button>
-          <button onClick={dismissPrompt} className="btn-secondary push-btn">Not Now</button>
+          <button onClick={requestPermission} className="btn-primary push-btn">{t('enable')}</button>
+          <button onClick={dismissPrompt} className="btn-secondary push-btn">{t('notNow')}</button>
         </div>
         <style jsx>{`
           .push-prompt {

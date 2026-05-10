@@ -124,7 +124,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (isLoading || !isLoggedIn) return <div className="page-container" style={{paddingTop:'100px', textAlign:'center'}}>Loading...</div>;
+  if (isLoading || !isLoggedIn) return <div className="page-container" style={{paddingTop:'100px', textAlign:'center'}}>{t('loading')}</div>;
 
   return (
     <main className="main-wrapper" style={{ background: '#f1f3f6', minHeight: '100vh' }}>
@@ -140,28 +140,28 @@ export default function DashboardPage() {
                   {user?.image ? <img src={user.image} alt="User" referrerPolicy="no-referrer" /> : <span>{profile.name?.charAt(0) || 'U'}</span>}
                 </div>
                 <div className="fk-hello">
-                  <span>Hello,</span>
+                  <span>{t('hello')}</span>
                   <strong>{profile.name}</strong>
                 </div>
               </div>
 
               <div className="fk-sidebar-nav">
                 <button onClick={() => setActiveTab('orders')} className={`fk-nav-mainbtn ${activeTab === 'orders' ? 'active' : ''}`}>
-                  <span className="fk-icon">📦</span> MY ORDERS
+                  <span className="fk-icon">📦</span> {t('myOrders')}
                 </button>
                 
                 <div className="fk-nav-group">
-                  <h3><span className="fk-icon">👤</span> ACCOUNT SETTINGS</h3>
-                  <button onClick={() => setActiveTab('profile')} className={`fk-nav-subbtn ${activeTab === 'profile' ? 'active' : ''}`}>Profile Information</button>
-                  <button onClick={() => setActiveTab('addresses')} className={`fk-nav-subbtn ${activeTab === 'addresses' ? 'active' : ''}`}>Manage Addresses</button>
-                  <button onClick={() => setActiveTab('notifications')} className={`fk-nav-subbtn ${activeTab === 'notifications' ? 'active' : ''}`}>Notifications</button>
+                  <h3><span className="fk-icon">👤</span> {t('accountSettings')}</h3>
+                  <button onClick={() => setActiveTab('profile')} className={`fk-nav-subbtn ${activeTab === 'profile' ? 'active' : ''}`}>{t('profileInfo')}</button>
+                  <button onClick={() => setActiveTab('addresses')} className={`fk-nav-subbtn ${activeTab === 'addresses' ? 'active' : ''}`}>{t('manageAddresses')}</button>
+                  <button onClick={() => setActiveTab('notifications')} className={`fk-nav-subbtn ${activeTab === 'notifications' ? 'active' : ''}`}>{t('notifications')}</button>
                 </div>
 
                 <div className="fk-nav-group">
-                  <h3><span className="fk-icon">💳</span> PAYMENTS</h3>
-                  <button onClick={() => setActiveTab('giftcards')} className={`fk-nav-subbtn ${activeTab === 'giftcards' ? 'active' : ''}`}>Gift Cards</button>
-                  <button onClick={() => setActiveTab('upi')} className={`fk-nav-subbtn ${activeTab === 'upi' ? 'active' : ''}`}>Saved UPI</button>
-                  <button onClick={() => setActiveTab('cards')} className={`fk-nav-subbtn ${activeTab === 'cards' ? 'active' : ''}`}>Saved Cards</button>
+                  <h3><span className="fk-icon">💳</span> {t('payments')}</h3>
+                  <button onClick={() => setActiveTab('giftcards')} className={`fk-nav-subbtn ${activeTab === 'giftcards' ? 'active' : ''}`}>{t('giftCards')}</button>
+                  <button onClick={() => setActiveTab('upi')} className={`fk-nav-subbtn ${activeTab === 'upi' ? 'active' : ''}`}>{t('savedUpi')}</button>
+                  <button onClick={() => setActiveTab('cards')} className={`fk-nav-subbtn ${activeTab === 'cards' ? 'active' : ''}`}>{t('savedCards')}</button>
                 </div>
               </div>
             </aside>
@@ -171,8 +171,8 @@ export default function DashboardPage() {
               {activeTab === 'profile' && (
                 <div className="fk-tab-content">
                   <div className="fk-tab-header">
-                    <h2>Personal Information</h2>
-                    <button className="fk-edit-link" onClick={() => setEditMode(!editMode)}>{editMode ? 'Cancel' : 'Edit'}</button>
+                    <h2>{t('personalInfo')}</h2>
+                    <button className="fk-edit-link" onClick={() => setEditMode(!editMode)}>{editMode ? t('cancel') : t('edit')}</button>
                   </div>
                   
                   <div className="fk-profile-form">
@@ -180,29 +180,29 @@ export default function DashboardPage() {
                       <input type="text" value={profile.name} onChange={e => setProfile({...profile, name: e.target.value})} disabled={!editMode} placeholder="Full Name" />
                     </div>
                     
-                    <h3 className="fk-field-label">Your Gender</h3>
+                    <h3 className="fk-field-label">{t('yourGender')}</h3>
                     <div className="fk-radio-group">
                       <label>
-                        <input type="radio" name="gender" value="Men" checked={profile.gender === 'Men'} disabled={!editMode || (profile.gender && profile.gender !== 'Not Specified')} onChange={e => setProfile({...profile, gender: e.target.value})} /> Male
+                        <input type="radio" name="gender" value="Men" checked={profile.gender === 'Men'} disabled={!editMode || (profile.gender && profile.gender !== 'Not Specified')} onChange={e => setProfile({...profile, gender: e.target.value})} /> {t('male')}
                       </label>
                       <label>
-                        <input type="radio" name="gender" value="Women" checked={profile.gender === 'Women'} disabled={!editMode || (profile.gender && profile.gender !== 'Not Specified')} onChange={e => setProfile({...profile, gender: e.target.value})} /> Female
+                        <input type="radio" name="gender" value="Women" checked={profile.gender === 'Women'} disabled={!editMode || (profile.gender && profile.gender !== 'Not Specified')} onChange={e => setProfile({...profile, gender: e.target.value})} /> {t('female')}
                       </label>
                     </div>
 
-                    <h3 className="fk-field-label">Email Address</h3>
+                    <h3 className="fk-field-label">{t('emailAddress')}</h3>
                     <div className="fk-input-group">
                       <input type="email" value={profile.email} disabled placeholder="Email Address" />
                     </div>
 
-                    <h3 className="fk-field-label">Mobile Number</h3>
+                    <h3 className="fk-field-label">{t('mobileNumber')}</h3>
                     <div className="fk-input-group">
                       <input type="tel" value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} disabled={!editMode} placeholder="+91 9876543210" />
                     </div>
 
                     {editMode && (
                       <button className="fk-save-btn" onClick={handleSaveProfile} disabled={saving}>
-                        {saving ? 'SAVING...' : 'SAVE'}
+                        {saving ? t('savingUpper') : t('save')}
                       </button>
                     )}
                   </div>
@@ -212,17 +212,17 @@ export default function DashboardPage() {
               {activeTab === 'addresses' && (
                 <div className="fk-tab-content">
                   <div className="fk-tab-header">
-                    <h2>Manage Addresses</h2>
+                    <h2>{t('manageAddresses')}</h2>
                   </div>
                   <div className="fk-tab-body" style={{ padding: '32px' }}>
                   
                   {!showAddAddress ? (
                     <button className="fk-add-address-btn" onClick={() => setShowAddAddress(true)}>
-                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>+</span> ADD A NEW ADDRESS
+                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>+</span> {t('addNewAddress')}
                     </button>
                   ) : (
                     <div className="fk-address-form-container">
-                      <h3 style={{ color: '#2874f0', marginBottom: '16px', fontSize: '14px', fontWeight: '500' }}>ADD A NEW ADDRESS</h3>
+                      <h3 style={{ color: '#2874f0', marginBottom: '16px', fontSize: '14px', fontWeight: '500' }}>{t('addNewAddress')}</h3>
                       <form onSubmit={handleSaveAddress} className="fk-address-form">
                         <div className="fk-form-row">
                           <input type="text" placeholder="Name" required value={newAddress.name} onChange={e => setNewAddress({...newAddress, name: e.target.value})} />
@@ -240,13 +240,13 @@ export default function DashboardPage() {
                           <input type="text" placeholder="State" required value={newAddress.state} onChange={e => setNewAddress({...newAddress, state: e.target.value})} />
                         </div>
                         <div className="fk-radio-group" style={{ margin: '16px 0' }}>
-                          <span style={{ fontSize: '14px', color: '#878787', marginRight: '16px' }}>Address Type</span>
-                          <label><input type="radio" name="type" value="Home" checked={newAddress.type === 'Home'} onChange={e => setNewAddress({...newAddress, type: e.target.value})} /> Home</label>
-                          <label><input type="radio" name="type" value="Work" checked={newAddress.type === 'Work'} onChange={e => setNewAddress({...newAddress, type: e.target.value})} /> Work</label>
+                          <span style={{ fontSize: '14px', color: '#878787', marginRight: '16px' }}>{t('addressType')}</span>
+                          <label><input type="radio" name="type" value="Home" checked={newAddress.type === 'Home'} onChange={e => setNewAddress({...newAddress, type: e.target.value})} /> {t('home')}</label>
+                          <label><input type="radio" name="type" value="Work" checked={newAddress.type === 'Work'} onChange={e => setNewAddress({...newAddress, type: e.target.value})} /> {t('work')}</label>
                         </div>
                         <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
-                          <button type="submit" className="fk-save-btn" style={{ marginTop: 0 }} disabled={saving}>SAVE AND DELIVER HERE</button>
-                          <button type="button" className="fk-cancel-btn" onClick={() => setShowAddAddress(false)}>CANCEL</button>
+                          <button type="submit" className="fk-save-btn" style={{ marginTop: 0 }} disabled={saving}>{t('saveAndDeliver')}</button>
+                          <button type="button" className="fk-cancel-btn" onClick={() => setShowAddAddress(false)}>{t('cancel').toUpperCase()}</button>
                         </div>
                       </form>
                     </div>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                       <div key={addr.id} className="fk-address-card">
                         <div className="fk-address-header">
                           <span className="fk-address-type">{addr.type}</span>
-                          <button onClick={() => handleDeleteAddress(addr.id)} className="fk-delete-btn">Delete</button>
+                          <button onClick={() => handleDeleteAddress(addr.id)} className="fk-delete-btn">{t('delete')}</button>
                         </div>
                         <p className="fk-address-name"><strong>{addr.name}</strong> &nbsp;&nbsp; <strong>{addr.phone}</strong></p>
                         <p className="fk-address-detail">{addr.address}, {addr.locality}</p>
@@ -272,14 +272,14 @@ export default function DashboardPage() {
               {activeTab === 'notifications' && (
                 <div className="fk-tab-content">
                   <div className="fk-tab-header">
-                    <h2>Push Notifications</h2>
+                    <h2>{t('pushNotifications')}</h2>
                   </div>
                   <div className="fk-tab-body" style={{ padding: '32px' }}>
                     <div style={{ textAlign: 'center', padding: '2rem 0' }}>
                       <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔔</div>
-                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>Stay Updated!</p>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>{t('stayUpdated')}</p>
                       <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
-                        Get instant alerts for order shipping updates and when your favorite out-of-stock items are back.
+                        {t('pushDescription')}
                       </p>
                       <button 
                         className="fk-save-btn" 
@@ -288,11 +288,11 @@ export default function DashboardPage() {
                           if (typeof window !== 'undefined' && window.requestPushPermission) {
                             window.requestPushPermission();
                           } else {
-                            addToast('Please enable notifications in your browser settings.', 'info');
+                            addToast(t('enableInBrowser'), 'info');
                           }
                         }}
                       >
-                        ENABLE NOTIFICATIONS
+                        {t('enableNotifications')}
                       </button>
                     </div>
                   </div>
@@ -302,13 +302,13 @@ export default function DashboardPage() {
               {activeTab === 'orders' && (
                 <div className="fk-tab-content">
                   <div className="fk-tab-header">
-                    <h2>My Orders</h2>
+                    <h2>{t('myOrders')}</h2>
                   </div>
                   <div className="fk-tab-body" style={{ padding: '32px' }}>
-                  {loadingOrders ? <p style={{ padding: '2rem', textAlign: 'center' }}>Loading orders...</p> : orders.length === 0 ? (
+                  {loadingOrders ? <p style={{ padding: '2rem', textAlign: 'center' }}>{t('loading')}</p> : orders.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                      <p style={{ fontSize: '1.2rem', color: '#878787', marginBottom: '1rem' }}>No orders found.</p>
-                      <Link href="/products" className="fk-save-btn" style={{ textDecoration: 'none', display: 'inline-block' }}>START SHOPPING</Link>
+                      <p style={{ fontSize: '1.2rem', color: '#878787', marginBottom: '1rem' }}>{t('noOrdersFound')}</p>
+                      <Link href="/products" className="fk-save-btn" style={{ textDecoration: 'none', display: 'inline-block' }}>{t('startShopping').toUpperCase()}</Link>
                     </div>
                   ) : (
                     <div className="fk-orders-list">
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="fk-order-details">
                             <p className="fk-order-title">{order.items.map(i => i.name).join(', ')}</p>
-                            <p className="fk-order-date">Ordered on {new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+                            <p className="fk-order-date">{t('orderedOn')} {new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
                           </div>
                           <div className="fk-order-price">₹{order.total?.toLocaleString('en-IN')}</div>
                           <div className="fk-order-status">
@@ -342,14 +342,14 @@ export default function DashboardPage() {
               {activeTab === 'giftcards' && (
                 <div className="fk-tab-content">
                   <div className="fk-tab-header">
-                    <h2>Gift Cards</h2>
+                    <h2>{t('giftCards')}</h2>
                   </div>
                   <div className="fk-tab-body" style={{ padding: '32px' }}>
                     <div style={{ textAlign: 'center', padding: '4rem 0' }}>
                       <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎁</div>
-                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Gift Cards found</p>
-                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You haven't added any gift cards yet.</p>
-                      <button className="fk-save-btn" style={{ display: 'inline-block' }}>ADD A GIFT CARD</button>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>{t('noGiftCards')}</p>
+                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>{t('noGiftCardsDesc')}</p>
+                      <button className="fk-save-btn" style={{ display: 'inline-block' }}>{t('addGiftCard')}</button>
                     </div>
                   </div>
                 </div>
@@ -358,13 +358,13 @@ export default function DashboardPage() {
               {activeTab === 'upi' && (
                 <div className="fk-tab-content">
                   <div className="fk-tab-header">
-                    <h2>Saved UPI</h2>
+                    <h2>{t('savedUpi')}</h2>
                   </div>
                   <div className="fk-tab-body" style={{ padding: '32px' }}>
                     <div style={{ textAlign: 'center', padding: '4rem 0' }}>
                       <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
-                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved UPI IDs</p>
-                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>Save your UPI IDs for faster payments.</p>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>{t('noSavedUpi')}</p>
+                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>{t('noSavedUpiDesc')}</p>
                     </div>
                   </div>
                 </div>
@@ -373,13 +373,13 @@ export default function DashboardPage() {
               {activeTab === 'cards' && (
                 <div className="fk-tab-content">
                   <div className="fk-tab-header">
-                    <h2>Saved Cards</h2>
+                    <h2>{t('savedCards')}</h2>
                   </div>
                   <div className="fk-tab-body" style={{ padding: '32px' }}>
                     <div style={{ textAlign: 'center', padding: '4rem 0' }}>
                       <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
-                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>No Saved Cards</p>
-                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>You can save your Credit/Debit cards for a seamless checkout experience.</p>
+                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>{t('noSavedCards')}</p>
+                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>{t('noSavedCardsDesc')}</p>
                     </div>
                   </div>
                 </div>
