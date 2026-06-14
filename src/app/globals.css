@@ -990,12 +990,85 @@ a {
 }
 
 .footer {
+  padding: 4rem 2rem 2rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border-color);
+  margin-top: 4rem;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 4rem;
+  text-align: left;
+}
+
+.footer-about {
+  flex: 1;
+  max-width: 800px;
+}
+
+.footer-about h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.footer-about p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.footer-social {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.instagram-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3);
+}
+
+.instagram-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 39, 67, 0.4);
+  color: white;
+}
+
+.footer-bottom {
   text-align: center;
-  padding: 2rem;
+  padding-top: 3rem;
+  margin-top: 3rem;
+  border-top: 1px solid var(--border-color);
   color: var(--text-secondary);
   font-size: 0.85rem;
-  font-weight: 500;
-  background: transparent;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  .footer-social {
+    align-items: flex-start;
+  }
 }
 
 /* Auth Pages */
