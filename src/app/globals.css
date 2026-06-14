@@ -204,6 +204,19 @@ a {
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo-img {
+  height: 45px;
+  width: auto;
+  border-radius: 50%;
+}
+
+.logo-text {
   font-family: 'Outfit', sans-serif;
   font-weight: 900;
   font-size: 1.3rem;
@@ -1314,7 +1327,9 @@ a {
 
 @media (max-width: 480px) {
   .header { padding: 0.6rem 0.6rem; }
-  .logo { font-size: 0.95rem; }
+  .logo { gap: 6px; }
+  .logo-img { height: 32px; }
+  .logo-text { font-size: 0.95rem; }
   .nav-links { gap: 0.3rem; }
   .nav-link { font-size: 0.75rem; padding: 0.3rem 0.5rem; }
   .cart-btn { padding: 0.4rem 0.8rem !important; }
@@ -1811,9 +1826,9 @@ a {
 }
 
 @media (max-width: 480px) {
-  .logo {
-    font-size: 0.95rem;
-  }
+  .logo { gap: 6px; }
+  .logo-img { height: 32px; }
+  .logo-text { font-size: 0.95rem; }
   .nav-links {
     gap: 0.6rem;
   }
