@@ -72,7 +72,7 @@ export default function Header() {
     <header className="header">
       <div className="header-left-col">
         <Link href="/" className="logo">
-          OATBITES <span style={{fontWeight: 300}}>BY SEJ</span>
+          <img src="/logo.png" alt="Oatbites by SEJ" style={{ height: '45px', width: 'auto', borderRadius: '50%' }} />
         </Link>
         
         {/* Amazon-style Address Display & Dropdown */}
