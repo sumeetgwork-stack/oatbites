@@ -7,6 +7,7 @@ import CartDrawer from '../components/CartDrawer';
 import { ToastProvider } from '../components/Toast';
 import AnalyticsTracker from '../components/AnalyticsTracker';
 import PushNotificationManager from '../components/PushNotificationManager';
+import InstallPrompt from '../components/InstallPrompt';
 
 export const metadata = {
   metadataBase: new URL('https://oatbitesbysej.vercel.app'),
@@ -38,6 +39,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#e67e22" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Oatbites" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+      </head>
       <body>
         <AuthProvider>
           <LanguageProvider>
@@ -45,6 +54,7 @@ export default function RootLayout({ children }) {
             <CartProvider>
               <ToastProvider>
                 <PushNotificationManager />
+                <InstallPrompt />
                 <Header />
                 <CartDrawer />
                 {children}
