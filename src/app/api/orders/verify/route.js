@@ -34,9 +34,20 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    // Send order confirmation email and push notification (async, non-blocking)
-    sendOrderConfirmationEmail(order).catch(err => console.error('[Email] Background send failed:', err));
-    sendPushToUser(session.user.email, orderConfirmationPush(order)).catch(err => console.error('[Push] Background send failed:', err));
+    // Send order confirmation email and push notification (must await on Vercel serverless)
+    try {
+      await sendOrderConfirmationEmail(order);
+      console.log('[Email] Order confirmation sent successfully');
+    } catch (err) {
+      console.error('[Email] Background send failed:', err);
+    }
+
+    try {
+      await sendPushToUser(session.user.email, orderConfirmationPush(order));
+      console.log('[Push] Order confirmation push sent successfully');
+    } catch (err) {
+      console.error('[Push] Background send failed:', err);
+    }
 
     return NextResponse.json({ success: true, order });
   } catch (error) {
