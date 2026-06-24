@@ -1,5 +1,5 @@
 export default function robots() {
-  const baseUrl = 'https://oatbitesbysej.vercel.app';
+  const baseUrl = 'https://oatbites.in';
   
   return {
     rules: {

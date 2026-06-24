@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="https://oatbitesbysej.vercel.app" target="_blank">🌐 Live Website</a> •
+  <a href="https://oatbites.in" target="_blank">🌐 Live Website</a> •
   <a href="https://www.instagram.com/oatbites_by_sej">📸 Instagram</a> •
   <a href="#-features">✨ Features</a> •
   <a href="#-tech-stack">🛠️ Tech Stack</a> •
@@ -250,7 +250,7 @@ The Android app is built as a **Trusted Web Activity** wrapper:
 ## 🤝 Connect
 
 <p align="center">
-  <a href="https://oatbitesbysej.vercel.app">🌐 Website</a> •
+  <a href="https://oatbites.in">🌐 Website</a> •
   <a href="https://www.instagram.com/oatbites_by_sej">📸 Instagram</a>
 </p>
 

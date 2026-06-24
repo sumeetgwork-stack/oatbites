@@ -1,7 +1,7 @@
 import { getAllProducts } from '@/lib/db';
 
 export default async function sitemap() {
-  const baseUrl = 'https://oatbitesbysej.vercel.app';
+  const baseUrl = 'https://oatbites.in';
   
   // Base routes
   const routes = ['', '/products', '/login', '/register'].map((route) => ({

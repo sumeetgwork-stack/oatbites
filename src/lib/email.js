@@ -113,7 +113,7 @@ export async function sendOrderConfirmationEmail(order) {
     ${shippingHtml}
 
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://oatbitesbysej.vercel.app/dashboard" 
+      <a href="https://oatbites.in/dashboard" 
          style="background: #2c1810; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
         Track Your Order →
       </a>
@@ -204,7 +204,7 @@ export async function sendShippingUpdateEmail(order, newStatus) {
     </table>
 
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://oatbitesbysej.vercel.app/dashboard" 
+      <a href="https://oatbites.in/dashboard" 
          style="background: #2c1810; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
         View Order Details →
       </a>
@@ -263,7 +263,7 @@ export async function sendBackInStockEmail(userEmail, product) {
     </p>
 
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://oatbitesbysej.vercel.app/products/${product.id}" 
+      <a href="https://oatbites.in/products/${product.id}" 
          style="background: #2c1810; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
         Shop Now →
       </a>

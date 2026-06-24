@@ -10,7 +10,7 @@ import PushNotificationManager from '../components/PushNotificationManager';
 import InstallPrompt from '../components/InstallPrompt';
 
 export const metadata = {
-  metadataBase: new URL('https://oatbitesbysej.vercel.app'),
+  metadataBase: new URL('https://oatbites.in'),
   title: 'Oatbites by SEJ | Premium Oat Products',
   description: 'Premium oatbites for a healthy lifestyle. Experience our 3D interactive world and shop the finest organic oat products.',
   keywords: ['oatbites', 'premium oats', 'organic snacks', 'healthy lifestyle', 'oat products', 'SEJ'],
@@ -23,7 +23,7 @@ export const metadata = {
   openGraph: {
     title: 'Oatbites by SEJ',
     description: 'Premium oatbites for a healthy lifestyle. Experience our 3D interactive world and shop the finest organic oat products.',
-    url: 'https://oatbitesbysej.vercel.app',
+    url: 'https://oatbites.in',
     siteName: 'Oatbites by SEJ',
     images: [{ url: '/logo.png', width: 500, height: 500, alt: 'Oatbites by SEJ Logo' }],
     type: 'website',
