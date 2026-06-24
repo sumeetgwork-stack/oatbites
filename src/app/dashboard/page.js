@@ -157,12 +157,6 @@ export default function DashboardPage() {
                   <button onClick={() => setActiveTab('notifications')} className={`fk-nav-subbtn ${activeTab === 'notifications' ? 'active' : ''}`}>{t('notifications')}</button>
                 </div>
 
-                <div className="fk-nav-group">
-                  <h3><span className="fk-icon">💳</span> {t('payments')}</h3>
-                  <button onClick={() => setActiveTab('giftcards')} className={`fk-nav-subbtn ${activeTab === 'giftcards' ? 'active' : ''}`}>{t('giftCards')}</button>
-                  <button onClick={() => setActiveTab('upi')} className={`fk-nav-subbtn ${activeTab === 'upi' ? 'active' : ''}`}>{t('savedUpi')}</button>
-                  <button onClick={() => setActiveTab('cards')} className={`fk-nav-subbtn ${activeTab === 'cards' ? 'active' : ''}`}>{t('savedCards')}</button>
-                </div>
               </div>
             </aside>
 
@@ -339,51 +333,6 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {activeTab === 'giftcards' && (
-                <div className="fk-tab-content">
-                  <div className="fk-tab-header">
-                    <h2>{t('giftCards')}</h2>
-                  </div>
-                  <div className="fk-tab-body" style={{ padding: '32px' }}>
-                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎁</div>
-                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>{t('noGiftCards')}</p>
-                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>{t('noGiftCardsDesc')}</p>
-                      <button className="fk-save-btn" style={{ display: 'inline-block' }}>{t('addGiftCard')}</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'upi' && (
-                <div className="fk-tab-content">
-                  <div className="fk-tab-header">
-                    <h2>{t('savedUpi')}</h2>
-                  </div>
-                  <div className="fk-tab-body" style={{ padding: '32px' }}>
-                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📱</div>
-                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>{t('noSavedUpi')}</p>
-                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>{t('noSavedUpiDesc')}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'cards' && (
-                <div className="fk-tab-content">
-                  <div className="fk-tab-header">
-                    <h2>{t('savedCards')}</h2>
-                  </div>
-                  <div className="fk-tab-body" style={{ padding: '32px' }}>
-                    <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
-                      <p style={{ fontSize: '1.1rem', color: '#212121', marginBottom: '0.5rem', fontWeight: '500' }}>{t('noSavedCards')}</p>
-                      <p style={{ fontSize: '0.9rem', color: '#878787', marginBottom: '2rem' }}>{t('noSavedCardsDesc')}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </section>
           </div>
         </div>
