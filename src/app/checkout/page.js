@@ -15,6 +15,7 @@ export default function CheckoutPage() {
   const { user, isLoggedIn, isLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
+  const SHIPPING_COST = 30;
   const [address, setAddress] = useState({
     fullName: '',
     phone: '',
@@ -90,7 +91,7 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: cart.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
-          total: cartTotal,
+          total: cartTotal + SHIPPING_COST,
           shippingAddress: address,
         }),
       });
@@ -261,20 +262,23 @@ export default function CheckoutPage() {
                   <span>₹{cartTotal.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="checkout-total-row">
-                  <span>{t('shipping')}</span>
-                  <span style={{ color: '#27ae60' }}>{t('free')}</span>
+                  <span style={{ display: 'flex', flexDirection: 'column' }}>
+                    {t('shipping')}
+                    <small style={{ fontSize: '0.8em', color: '#666', fontWeight: 'normal' }}>(Delivery in 5-6 days)</small>
+                  </span>
+                  <span>₹{SHIPPING_COST}</span>
                 </div>
                 <div className="checkout-divider"></div>
                 <div className="checkout-total-row grand-total">
                   <span>{t('total')}</span>
-                  <span>₹{cartTotal.toLocaleString('en-IN')}</span>
+                  <span>₹{(cartTotal + SHIPPING_COST).toLocaleString('en-IN')}</span>
                 </div>
                 <button 
                   className="btn-primary checkout-pay-btn"
                   onClick={handlePayment}
                   disabled={processing}
                 >
-                  {processing ? 'Processing...' : `${t('payNow')} ₹${cartTotal.toLocaleString('en-IN')}`}
+                  {processing ? 'Processing...' : `${t('payNow')} ₹${(cartTotal + SHIPPING_COST).toLocaleString('en-IN')}`}
                 </button>
               </div>
             </div>
