@@ -76,6 +76,38 @@ export default function CheckoutPage() {
     }
   }, [cart, isLoading, isLoggedIn, router, user?.name]);
 
+  const handleCOD = async () => {
+    if (!address.fullName || !address.phone || !address.street || !address.city || !address.state || !address.pincode) {
+      alert('Please fill in all shipping details');
+      return;
+    }
+
+    setProcessing(true);
+
+    try {
+      const res = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
+          total: cartTotal + SHIPPING_COST,
+          shippingAddress: address,
+          paymentMethod: 'COD',
+        }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      clearCart();
+      router.push(`/order-confirmation?id=${data.orderId}`);
+    } catch (error) {
+      console.error('COD failed:', error);
+      alert('Something went wrong. Please try again.');
+      setProcessing(false);
+    }
+  };
+
   const handlePayment = async () => {
     if (!address.fullName || !address.phone || !address.street || !address.city || !address.state || !address.pincode) {
       alert('Please fill in all shipping details');
@@ -273,13 +305,24 @@ export default function CheckoutPage() {
                   <span>{t('total')}</span>
                   <span>₹{(cartTotal + SHIPPING_COST).toLocaleString('en-IN')}</span>
                 </div>
-                <button 
-                  className="btn-primary checkout-pay-btn"
-                  onClick={handlePayment}
-                  disabled={processing}
-                >
-                  {processing ? 'Processing...' : `${t('payNow')} ₹${(cartTotal + SHIPPING_COST).toLocaleString('en-IN')}`}
-                </button>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                  <button 
+                    className="btn-primary checkout-pay-btn"
+                    onClick={handlePayment}
+                    disabled={processing}
+                    style={{ flex: 1, margin: 0 }}
+                  >
+                    {processing ? 'Processing...' : `Pay Online ₹${(cartTotal + SHIPPING_COST).toLocaleString('en-IN')}`}
+                  </button>
+                  <button 
+                    className="btn-secondary checkout-pay-btn"
+                    onClick={handleCOD}
+                    disabled={processing}
+                    style={{ flex: 1, background: '#f8f9fa', color: '#2c1810', border: '1px solid #dcdde1', margin: 0 }}
+                  >
+                    {processing ? 'Processing...' : 'Cash on Delivery'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

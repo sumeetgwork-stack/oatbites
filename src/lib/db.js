@@ -116,6 +116,39 @@ export async function updateOrderPayment(orderId, paymentData) {
   return result;
 }
 
+export async function processCodOrder(orderId) {
+  const orders = await getCollection('orders');
+  
+  let query = { id: orderId };
+  try { query = { $or: [{ id: orderId }, { _id: new ObjectId(orderId) }] }; } catch(e) {}
+  
+  const order = await orders.findOne(query);
+  if (!order) return null;
+
+  const update = {
+    status: 'Pending (COD)',
+    paymentMethod: 'COD',
+  };
+  
+  const result = await orders.findOneAndUpdate(
+    query,
+    { $set: update },
+    { returnDocument: 'after' }
+  );
+
+  if (result && order.items && order.items.length > 0) {
+    const products = await getCollection('products');
+    for (const item of order.items) {
+      await products.updateOne(
+        { $or: [{ id: item.id }, { _id: item.id }] },
+        { $inc: { stock: -item.quantity } }
+      );
+    }
+  }
+
+  return result;
+}
+
 // Product helpers
 export async function getAllProducts() {
   const products = await getCollection('products');
