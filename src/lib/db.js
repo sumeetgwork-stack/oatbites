@@ -43,7 +43,10 @@ export async function createOrder(orderData) {
 
 export async function getOrdersByUserId(email) {
   const orders = await getCollection('orders');
-  const result = await orders.find({ userEmail: email }).sort({ createdAt: -1 }).toArray();
+  const result = await orders.find({ 
+    userEmail: email,
+    status: { $ne: 'Pending' }
+  }).sort({ createdAt: -1 }).toArray();
   return result.map(order => ({
     ...order,
     id: order.id || order._id.toString()
@@ -52,7 +55,9 @@ export async function getOrdersByUserId(email) {
 
 export async function getAllOrders() {
   const orders = await getCollection('orders');
-  const result = await orders.find({}).sort({ createdAt: -1 }).toArray();
+  const result = await orders.find({
+    status: { $ne: 'Pending' }
+  }).sort({ createdAt: -1 }).toArray();
   return result.map(order => ({
     ...order,
     id: order.id || order._id.toString()
