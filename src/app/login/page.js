@@ -3,17 +3,18 @@
 import { signIn } from 'next-auth/react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
 const Scene = dynamic(() => import('../../components/Scene'), { ssr: false });
 
-export default function LoginPage() {
+function LoginContent() {
   const { isLoggedIn, isLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +26,26 @@ export default function LoginPage() {
       router.push('/');
     }
   }, [isLoggedIn, router]);
+
+  // Handle PWA-captured OAuth redirects gracefully
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (!error) return;
+
+    const isStandalone = typeof window !== 'undefined' && 
+      (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone);
+
+    if (isStandalone && !sessionStorage.getItem('auth_pwa_retry')) {
+      // PWA captured an OAuth redirect from the browser — auto-retry within PWA context
+      sessionStorage.setItem('auth_pwa_retry', 'true');
+      signIn('google', { callbackUrl: '/' });
+    } else {
+      sessionStorage.removeItem('auth_pwa_retry');
+      if (error === 'OAuthCallback' || error === 'Configuration') {
+        setError('Sign-in failed. Please try again.');
+      }
+    }
+  }, [searchParams]);
 
   const handleCredentialsLogin = async (e) => {
     e.preventDefault();
@@ -118,5 +139,13 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="page-container" style={{paddingTop:'100px', textAlign:'center'}}>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
