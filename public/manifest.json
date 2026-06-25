@@ -8,6 +8,10 @@
   "background_color": "#faf9f6",
   "theme_color": "#e67e22",
   "scope": "/",
+  "handle_links": "none",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
