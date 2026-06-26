@@ -10,6 +10,16 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Block Google-owned email domains — these users must use "Continue with Google"
+    // to prove they own the email address
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    const googleDomains = ['gmail.com', 'googlemail.com'];
+    if (googleDomains.includes(emailDomain)) {
+      return NextResponse.json({ 
+        error: 'Gmail users must sign in with "Continue with Google" to verify email ownership.' 
+      }, { status: 400 });
+    }
+
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json({ error: 'User already exists with this email' }, { status: 400 });

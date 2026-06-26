@@ -20,6 +20,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
+        // Block Gmail users from credentials login — must use Google OAuth
+        const domain = credentials.email.split('@')[1]?.toLowerCase();
+        if (domain === 'gmail.com' || domain === 'googlemail.com') {
+          return null;
+        }
         const user = await findUserByEmail(credentials.email);
         if (!user || !user.password) {
           return null;
