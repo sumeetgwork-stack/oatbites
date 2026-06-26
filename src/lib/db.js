@@ -289,6 +289,39 @@ export function readJSON(filename) { return []; }
 export function writeJSON(filename, data) { return true; }
 
 // ==========================================
+// EMAIL OTP VERIFICATION HELPERS
+// ==========================================
+
+export async function createOTP(email, otp) {
+  const otps = await getCollection('email_otps');
+  // Delete any existing OTP for this email
+  await otps.deleteMany({ email: email.toLowerCase() });
+  const doc = {
+    email: email.toLowerCase(),
+    otp,
+    createdAt: new Date(),
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+  };
+  await otps.insertOne(doc);
+  return doc;
+}
+
+export async function verifyOTP(email, otp) {
+  const otps = await getCollection('email_otps');
+  const doc = await otps.findOne({
+    email: email.toLowerCase(),
+    otp,
+    expiresAt: { $gt: new Date() },
+  });
+  return !!doc;
+}
+
+export async function deleteOTP(email) {
+  const otps = await getCollection('email_otps');
+  await otps.deleteMany({ email: email.toLowerCase() });
+}
+
+// ==========================================
 // REVIEW HELPERS
 // ==========================================
 

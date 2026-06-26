@@ -1,23 +1,19 @@
-import { createUser, findUserByEmail } from '@/lib/db';
+import { createUser, findUserByEmail, verifyOTP, deleteOTP } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req) {
   try {
-    const { name, email, password, gender } = await req.json();
+    const { name, email, password, gender, otp } = await req.json();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !otp) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Block Google-owned email domains — these users must use "Continue with Google"
-    // to prove they own the email address
-    const emailDomain = email.split('@')[1]?.toLowerCase();
-    const googleDomains = ['gmail.com', 'googlemail.com'];
-    if (googleDomains.includes(emailDomain)) {
-      return NextResponse.json({ 
-        error: 'Gmail users must sign in with "Continue with Google" to verify email ownership.' 
-      }, { status: 400 });
+    // Verify OTP first
+    const isValidOTP = await verifyOTP(email, otp);
+    if (!isValidOTP) {
+      return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
     }
 
     const existingUser = await findUserByEmail(email);
@@ -31,8 +27,12 @@ export async function POST(req) {
       name,
       email,
       password: hashedPassword,
-      gender: gender || 'Men'
+      gender: gender || 'Men',
+      emailVerified: true,
     });
+
+    // Clean up used OTP
+    await deleteOTP(email);
 
     return NextResponse.json({ success: true, user: { name: newUser.name, email: newUser.email } });
   } catch (error) {

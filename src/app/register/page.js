@@ -22,14 +22,67 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // OTP state
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
   useEffect(() => {
     if (isLoggedIn) {
       router.push('/');
     }
   }, [isLoggedIn, router]);
 
+  // Countdown timer for resend
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  const handleSendOTP = async () => {
+    if (!email) {
+      setError('Please enter your email address first');
+      return;
+    }
+    if (!name || !password) {
+      setError('Please fill all fields before verifying email');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setOtpLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, mode: 'register' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      setOtpSent(true);
+      setCountdown(60);
+    } catch (err) {
+      setError(err.message);
+    }
+    setOtpLoading(false);
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!otpSent || !otp) {
+      setError('Please verify your email first');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
 
@@ -37,7 +90,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, gender }),
+        body: JSON.stringify({ name, email, password, gender, otp }),
       });
       
       const data = await res.json();
@@ -99,16 +152,89 @@ export default function RegisterPage() {
                 value={name} 
                 onChange={e => setName(e.target.value)} 
                 required 
+                disabled={otpSent}
                 className="auth-input"
               />
-              <input 
-                type="email" 
-                placeholder={t('emailAddress')} 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
-                className="auth-input"
-              />
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="email" 
+                  placeholder={t('emailAddress')} 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  required 
+                  disabled={otpSent}
+                  className="auth-input"
+                  style={{ paddingRight: '90px' }}
+                />
+                {!otpSent && (
+                  <button
+                    type="button"
+                    onClick={handleSendOTP}
+                    disabled={otpLoading || !email}
+                    style={{
+                      position: 'absolute',
+                      right: '4px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'var(--accent-color)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      fontSize: '0.78rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      opacity: otpLoading || !email ? 0.6 : 1,
+                    }}
+                  >
+                    {otpLoading ? '...' : 'Verify'}
+                  </button>
+                )}
+                {otpSent && (
+                  <span style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#27ae60',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                  }}>
+                    ✓ Sent
+                  </span>
+                )}
+              </div>
+
+              {otpSent && (
+                <div>
+                  <input 
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    maxLength={6}
+                    required
+                    className="auth-input"
+                    style={{ letterSpacing: '4px', textAlign: 'center', fontWeight: '700', fontSize: '1.1rem' }}
+                    autoFocus
+                  />
+                  <p style={{ fontSize: '0.8rem', color: '#888', margin: '4px 0 0', textAlign: 'center' }}>
+                    Check your inbox for the verification code.
+                    {countdown > 0 ? (
+                      <span> Resend in {countdown}s</span>
+                    ) : (
+                      <button 
+                        type="button" 
+                        onClick={handleSendOTP}
+                        style={{ background: 'none', border: 'none', color: 'var(--accent-color)', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem', padding: '0 4px' }}
+                      >
+                        Resend
+                      </button>
+                    )}
+                  </p>
+                </div>
+              )}
+
               <input 
                 type="password" 
                 placeholder={t('password')} 
@@ -116,6 +242,7 @@ export default function RegisterPage() {
                 onChange={e => setPassword(e.target.value)} 
                 required 
                 minLength={6}
+                disabled={otpSent}
                 className="auth-input"
               />
 
@@ -127,7 +254,7 @@ export default function RegisterPage() {
                   <input type="radio" name="gender" value="Women" checked={gender === 'Women'} onChange={e => setGender(e.target.value)} style={{ accentColor: 'var(--accent-color)' }} /> {t('women')}
                 </label>
               </div>
-              <button type="submit" className="btn-primary auth-submit" disabled={isSubmitting}>
+              <button type="submit" className="btn-primary auth-submit" disabled={isSubmitting || !otpSent || otp.length !== 6}>
                 {isSubmitting ? t('creatingAccount') : t('signUp')}
               </button>
             </form>

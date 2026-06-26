@@ -293,3 +293,41 @@ export async function sendBackInStockEmail(userEmail, product) {
     return null;
   }
 }
+
+export async function sendOTPEmail(email, otp) {
+  const t = getTransporter();
+  if (!t) return null;
+
+  const mailOptions = {
+    from: `"Oatbites by SEJ" <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: `${otp} is your Oatbites verification code`,
+    html: `
+    <div style="max-width: 480px; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif; background: #faf9f6; border-radius: 16px; overflow: hidden; border: 1px solid #f0ebe3;">
+      <div style="background: linear-gradient(135deg, #e67e22, #d35400); padding: 32px; text-align: center;">
+        <h1 style="color: #fff; margin: 0; font-size: 24px;">🌾 Oatbites by SEJ</h1>
+      </div>
+      <div style="padding: 40px 32px; text-align: center;">
+        <p style="color: #555; font-size: 16px; margin: 0 0 8px;">Your verification code is:</p>
+        <div style="background: #fff; border: 2px dashed #e67e22; border-radius: 12px; padding: 20px; margin: 20px 0;">
+          <span style="font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #2c1810;">${otp}</span>
+        </div>
+        <p style="color: #888; font-size: 14px; margin: 20px 0 0;">This code expires in <strong>10 minutes</strong>.</p>
+        <p style="color: #888; font-size: 13px; margin: 8px 0 0;">If you didn't request this, please ignore this email.</p>
+      </div>
+      <div style="background: #f5f0ea; padding: 16px; text-align: center;">
+        <p style="color: #999; font-size: 12px; margin: 0;">© ${new Date().getFullYear()} Oatbites by SEJ. All rights reserved.</p>
+      </div>
+    </div>
+    `,
+  };
+
+  try {
+    const info = await t.sendMail(mailOptions);
+    console.log('[Email] OTP sent to:', email);
+    return info;
+  } catch (err) {
+    console.error('[Email] Error sending OTP:', err);
+    return null;
+  }
+}
