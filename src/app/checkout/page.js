@@ -24,7 +24,50 @@ export default function CheckoutPage() {
     state: '',
     pincode: '',
   });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [processing, setProcessing] = useState(false);
+
+  const validateForm = () => {
+    const errors = {};
+    if (!address.fullName?.trim()) errors.fullName = 'Full Name is required';
+    else if (address.fullName.trim().length < 2) errors.fullName = 'Full Name must be at least 2 characters';
+
+    if (!address.phone?.trim()) errors.phone = 'Phone Number is required';
+    else if (address.phone.length !== 10) errors.phone = 'Phone Number must be exactly 10 digits';
+
+    if (!address.street?.trim()) errors.street = 'Street Address is required';
+    else if (address.street.trim().length < 5) errors.street = 'Address must be at least 5 characters';
+
+    if (!address.city?.trim()) errors.city = 'City is required';
+    else if (address.city.trim().length < 2) errors.city = 'City must be at least 2 characters';
+
+    if (!address.state?.trim()) errors.state = 'State is required';
+    else if (address.state.trim().length < 2) errors.state = 'State must be at least 2 characters';
+
+    if (!address.pincode?.trim()) errors.pincode = 'Pincode is required';
+    else if (address.pincode.length !== 6) errors.pincode = 'Pincode must be exactly 6 digits';
+
+    if (!address.fullName || address.fullName.trim().length < 2) {
+      errors.fullName = 'Name must be at least 2 characters';
+    }
+    if (!address.phone || !/^\d{10}$/.test(address.phone)) {
+      errors.phone = 'Phone must be exactly 10 digits';
+    }
+    if (!address.street || address.street.trim().length < 5) {
+      errors.street = 'Street address must be at least 5 characters';
+    }
+    if (!address.city || address.city.trim().length < 2) {
+      errors.city = 'City must be at least 2 characters';
+    }
+    if (!address.state || address.state.trim().length < 2) {
+      errors.state = 'State must be at least 2 characters';
+    }
+    if (!address.pincode || !/^\d{6}$/.test(address.pincode)) {
+      errors.pincode = 'Pincode must be exactly 6 digits';
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -39,7 +82,6 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Auto-detect address
       fetch('/api/user/profile')
         .then(res => res.json())
         .then(data => {
@@ -64,7 +106,6 @@ export default function CheckoutPage() {
               pincode: selectedAddr.pincode || '',
             });
           } else if (data.address) {
-            // Fallback to legacy single address string
             setAddress(prev => ({
               ...prev,
               fullName: user?.name || '',
@@ -77,10 +118,7 @@ export default function CheckoutPage() {
   }, [cart, isLoading, isLoggedIn, router, user?.name]);
 
   const handleCOD = async () => {
-    if (!address.fullName || !address.phone || !address.street || !address.city || !address.state || !address.pincode) {
-      alert('Please fill in all shipping details');
-      return;
-    }
+    if (!validateForm()) return;
 
     setProcessing(true);
 
@@ -109,15 +147,11 @@ export default function CheckoutPage() {
   };
 
   const handlePayment = async () => {
-    if (!address.fullName || !address.phone || !address.street || !address.city || !address.state || !address.pincode) {
-      alert('Please fill in all shipping details');
-      return;
-    }
+    if (!validateForm()) return;
 
     setProcessing(true);
 
     try {
-      // 1. Create order on server
       const res = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -131,7 +165,6 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // 2. Open Razorpay checkout
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
@@ -140,7 +173,6 @@ export default function CheckoutPage() {
         description: `Order ${data.orderId}`,
         order_id: data.razorpayOrderId,
         handler: async function(response) {
-          // 3. Verify payment on server
           const verifyRes = await fetch('/api/orders/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -204,70 +236,101 @@ export default function CheckoutPage() {
         <div className="content-layer">
           <div className="page-container">
             <div className="checkout-layout">
-              {/* Shipping Form */}
               <div className="checkout-form glass-panel">
                 <h2>{t('shippingDetails')}</h2>
                 <div className="form-grid">
-                  <label className="form-field">
+                  <div className="form-field">
                     <span>{t('fullName')}</span>
                     <input 
                       type="text" 
                       value={address.fullName}
-                      onChange={e => setAddress({...address, fullName: e.target.value})}
+                      onChange={e => {
+                        setAddress({...address, fullName: e.target.value});
+                        setFieldErrors(p => ({...p, fullName: ''}));
+                      }}
                       placeholder={t('fullName')}
-                      required
+                      className={fieldErrors.fullName ? 'input-error' : ''}
+                      style={{ fontSize: '16px' }}
                     />
-                  </label>
-                  <label className="form-field">
+                    {fieldErrors.fullName && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem' }}>{fieldErrors.fullName}</span>}
+                  </div>
+                  <div className="form-field">
                     <span>{t('phone')}</span>
                     <input 
                       type="tel" 
                       value={address.phone}
-                      onChange={e => setAddress({...address, phone: e.target.value})}
-                      placeholder="+91 XXXXX XXXXX"
-                      required
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setAddress({...address, phone: val});
+                        setFieldErrors(p => ({...p, phone: ''}));
+                      }}
+                      placeholder="10-digit number"
+                      className={fieldErrors.phone ? 'input-error' : ''}
+                      style={{ fontSize: '16px' }}
                     />
-                  </label>
-                  <label className="form-field full-width">
+                    {fieldErrors.phone && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem' }}>{fieldErrors.phone}</span>}
+                  </div>
+                  <div className="form-field full-width">
                     <span>{t('streetAddress')}</span>
                     <input 
                       type="text" 
                       value={address.street}
-                      onChange={e => setAddress({...address, street: e.target.value})}
+                      onChange={e => {
+                        setAddress({...address, street: e.target.value});
+                        setFieldErrors(p => ({...p, street: ''}));
+                      }}
                       placeholder={t('streetAddress')}
-                      required
+                      className={fieldErrors.street ? 'input-error' : ''}
+                      style={{ fontSize: '16px' }}
                     />
-                  </label>
-                  <label className="form-field">
+                    {fieldErrors.street && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem' }}>{fieldErrors.street}</span>}
+                  </div>
+                  <div className="form-field">
                     <span>{t('city')}</span>
                     <input 
                       type="text" 
                       value={address.city}
-                      onChange={e => setAddress({...address, city: e.target.value})}
+                      onChange={e => {
+                        setAddress({...address, city: e.target.value});
+                        setFieldErrors(p => ({...p, city: ''}));
+                      }}
                       placeholder={t('city')}
-                      required
+                      className={fieldErrors.city ? 'input-error' : ''}
+                      style={{ fontSize: '16px' }}
                     />
-                  </label>
-                  <label className="form-field">
+                    {fieldErrors.city && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem' }}>{fieldErrors.city}</span>}
+                  </div>
+                  <div className="form-field">
                     <span>{t('state')}</span>
                     <input 
                       type="text" 
                       value={address.state}
-                      onChange={e => setAddress({...address, state: e.target.value})}
+                      onChange={e => {
+                        setAddress({...address, state: e.target.value});
+                        setFieldErrors(p => ({...p, state: ''}));
+                      }}
                       placeholder={t('state')}
-                      required
+                      className={fieldErrors.state ? 'input-error' : ''}
+                      style={{ fontSize: '16px' }}
                     />
-                  </label>
-                  <label className="form-field">
+                    {fieldErrors.state && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem' }}>{fieldErrors.state}</span>}
+                  </div>
+                  <div className="form-field">
                     <span>{t('pincode')}</span>
                     <input 
                       type="text" 
                       value={address.pincode}
-                      onChange={e => setAddress({...address, pincode: e.target.value})}
-                      placeholder="XXXXXX"
-                      required
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                        setAddress({...address, pincode: val});
+                        setFieldErrors(p => ({...p, pincode: ''}));
+                      }}
+                      placeholder="6-digit pincode"
+                      className={fieldErrors.pincode ? 'input-error' : ''}
+                      style={{ fontSize: '16px' }}
                     />
-                  </label>
+                    {fieldErrors.pincode && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem' }}>{fieldErrors.pincode}</span>}
+                  </div>
                 </div>
               </div>
 

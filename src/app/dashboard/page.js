@@ -32,6 +32,8 @@ export default function DashboardPage() {
   // Addresses state
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({ name: '', phone: '', pincode: '', locality: '', address: '', city: '', state: '', type: 'Home' });
+  const [addressErrors, setAddressErrors] = useState({});
+  const [profileErrors, setProfileErrors] = useState({});
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) router.push('/login');
@@ -62,6 +64,15 @@ export default function DashboardPage() {
   }, [isLoggedIn, user]);
 
   const handleSaveProfile = async () => {
+    const pErrors = {};
+    if (profile.phone && !/^\d{10}$/.test(profile.phone)) {
+      pErrors.phone = 'Phone must be exactly 10 digits';
+    }
+    if (Object.keys(pErrors).length > 0) {
+      setProfileErrors(pErrors);
+      return;
+    }
+    setProfileErrors({});
     setSaving(true);
     try {
       const res = await fetch('/api/user/profile', {
@@ -83,6 +94,33 @@ export default function DashboardPage() {
 
   const handleSaveAddress = async (e) => {
     e.preventDefault();
+    const errors = {};
+    if (!newAddress.name || newAddress.name.trim().length < 2) {
+      errors.name = 'Name is required (min 2 characters)';
+    }
+    if (!newAddress.phone || !/^\d{10}$/.test(newAddress.phone)) {
+      errors.phone = 'Phone must be exactly 10 digits';
+    }
+    if (!newAddress.pincode || !/^\d{6}$/.test(newAddress.pincode)) {
+      errors.pincode = 'Pincode must be exactly 6 digits';
+    }
+    if (!newAddress.locality || !newAddress.locality.trim()) {
+      errors.locality = 'Locality is required';
+    }
+    if (!newAddress.address || newAddress.address.trim().length < 5) {
+      errors.address = 'Address is required (min 5 characters)';
+    }
+    if (!newAddress.city || !newAddress.city.trim()) {
+      errors.city = 'City is required';
+    }
+    if (!newAddress.state || !newAddress.state.trim()) {
+      errors.state = 'State is required';
+    }
+    if (Object.keys(errors).length > 0) {
+      setAddressErrors(errors);
+      return;
+    }
+    setAddressErrors({});
     setSaving(true);
     try {
       const currentAddresses = profile.addresses || [];
@@ -96,6 +134,7 @@ export default function DashboardPage() {
         setProfile({ ...profile, addresses: updatedAddresses });
         setShowAddAddress(false);
         setNewAddress({ name: '', phone: '', pincode: '', locality: '', address: '', city: '', state: '', type: 'Home' });
+        setAddressErrors({});
         addToast('Address added successfully!', 'success');
       } else {
         const d = await res.json();
@@ -191,7 +230,8 @@ export default function DashboardPage() {
 
                     <h3 className="fk-field-label">{t('mobileNumber')}</h3>
                     <div className="fk-input-group">
-                      <input type="tel" value={profile.phone} onChange={e => setProfile({...profile, phone: e.target.value})} disabled={!editMode} placeholder="+91 9876543210" />
+                      <input type="tel" value={profile.phone} onChange={e => { const v = e.target.value.replace(/\D/g, '').slice(0, 10); setProfile({...profile, phone: v}); if (profileErrors.phone) setProfileErrors(prev => ({ ...prev, phone: '' })); }} disabled={!editMode} placeholder="+91 9876543210" style={{ fontSize: '16px' }} />
+                      {profileErrors.phone && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{profileErrors.phone}</span>}
                     </div>
 
                     {editMode && (
@@ -217,21 +257,42 @@ export default function DashboardPage() {
                   ) : (
                     <div className="fk-address-form-container">
                       <h3 style={{ color: '#2874f0', marginBottom: '16px', fontSize: '14px', fontWeight: '500' }}>{t('addNewAddress')}</h3>
-                      <form onSubmit={handleSaveAddress} className="fk-address-form">
+                      <form onSubmit={handleSaveAddress} className="fk-address-form" noValidate>
                         <div className="fk-form-row">
-                          <input type="text" placeholder="Name" required value={newAddress.name} onChange={e => setNewAddress({...newAddress, name: e.target.value})} />
-                          <input type="text" placeholder="10-digit mobile number" required value={newAddress.phone} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} />
+                          <div style={{ flex: 1 }}>
+                            <input type="text" placeholder="Name" value={newAddress.name} onChange={e => { setNewAddress({...newAddress, name: e.target.value}); if (addressErrors.name) setAddressErrors(prev => ({ ...prev, name: '' })); }} style={{ fontSize: '16px', width: '100%' }} />
+                            {addressErrors.name && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{addressErrors.name}</span>}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <input type="tel" placeholder="10-digit mobile number" value={newAddress.phone} onChange={e => { const v = e.target.value.replace(/\D/g, '').slice(0, 10); setNewAddress({...newAddress, phone: v}); if (addressErrors.phone) setAddressErrors(prev => ({ ...prev, phone: '' })); }} style={{ fontSize: '16px', width: '100%' }} />
+                            {addressErrors.phone && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{addressErrors.phone}</span>}
+                          </div>
                         </div>
                         <div className="fk-form-row">
-                          <input type="text" placeholder="Pincode" required value={newAddress.pincode} onChange={e => setNewAddress({...newAddress, pincode: e.target.value})} />
-                          <input type="text" placeholder="Locality" required value={newAddress.locality} onChange={e => setNewAddress({...newAddress, locality: e.target.value})} />
+                          <div style={{ flex: 1 }}>
+                            <input type="text" placeholder="Pincode" value={newAddress.pincode} onChange={e => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setNewAddress({...newAddress, pincode: v}); if (addressErrors.pincode) setAddressErrors(prev => ({ ...prev, pincode: '' })); }} style={{ fontSize: '16px', width: '100%' }} />
+                            {addressErrors.pincode && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{addressErrors.pincode}</span>}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <input type="text" placeholder="Locality" value={newAddress.locality} onChange={e => { setNewAddress({...newAddress, locality: e.target.value}); if (addressErrors.locality) setAddressErrors(prev => ({ ...prev, locality: '' })); }} style={{ fontSize: '16px', width: '100%' }} />
+                            {addressErrors.locality && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{addressErrors.locality}</span>}
+                          </div>
                         </div>
                         <div className="fk-form-row full">
-                          <textarea placeholder="Address (Area and Street)" required rows="3" value={newAddress.address} onChange={e => setNewAddress({...newAddress, address: e.target.value})}></textarea>
+                          <div style={{ width: '100%' }}>
+                            <textarea placeholder="Address (Area and Street)" rows="3" value={newAddress.address} onChange={e => { setNewAddress({...newAddress, address: e.target.value}); if (addressErrors.address) setAddressErrors(prev => ({ ...prev, address: '' })); }} style={{ fontSize: '16px', width: '100%' }}></textarea>
+                            {addressErrors.address && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{addressErrors.address}</span>}
+                          </div>
                         </div>
                         <div className="fk-form-row">
-                          <input type="text" placeholder="City/District/Town" required value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} />
-                          <input type="text" placeholder="State" required value={newAddress.state} onChange={e => setNewAddress({...newAddress, state: e.target.value})} />
+                          <div style={{ flex: 1 }}>
+                            <input type="text" placeholder="City/District/Town" value={newAddress.city} onChange={e => { setNewAddress({...newAddress, city: e.target.value}); if (addressErrors.city) setAddressErrors(prev => ({ ...prev, city: '' })); }} style={{ fontSize: '16px', width: '100%' }} />
+                            {addressErrors.city && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{addressErrors.city}</span>}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <input type="text" placeholder="State" value={newAddress.state} onChange={e => { setNewAddress({...newAddress, state: e.target.value}); if (addressErrors.state) setAddressErrors(prev => ({ ...prev, state: '' })); }} style={{ fontSize: '16px', width: '100%' }} />
+                            {addressErrors.state && <span className="field-error" style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>{addressErrors.state}</span>}
+                          </div>
                         </div>
                         <div className="fk-radio-group" style={{ margin: '16px 0' }}>
                           <span style={{ fontSize: '14px', color: '#878787', marginRight: '16px' }}>{t('addressType')}</span>
@@ -240,7 +301,7 @@ export default function DashboardPage() {
                         </div>
                         <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
                           <button type="submit" className="fk-save-btn" style={{ marginTop: 0 }} disabled={saving}>{t('saveAndDeliver')}</button>
-                          <button type="button" className="fk-cancel-btn" onClick={() => setShowAddAddress(false)}>{t('cancel').toUpperCase()}</button>
+                          <button type="button" className="fk-cancel-btn" onClick={() => { setShowAddAddress(false); setAddressErrors({}); }}>{t('cancel').toUpperCase()}</button>
                         </div>
                       </form>
                     </div>

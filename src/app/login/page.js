@@ -19,6 +19,7 @@ function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -49,8 +50,16 @@ function LoginContent() {
 
   const handleCredentialsLogin = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError('');
+    const errors = {};
+    if (!email) errors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Enter a valid email';
+    if (!password) errors.password = 'Password is required';
+    else if (password.length < 6) errors.password = 'Password must be at least 6 characters';
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    setIsSubmitting(true);
 
     const res = await signIn('credentials', {
       redirect: false,
@@ -94,22 +103,26 @@ function LoginContent() {
             {error && <div className="auth-error">{error}</div>}
             
             <form onSubmit={handleCredentialsLogin} className="auth-form">
-              <input 
-                type="email" 
-                placeholder={t('emailAddress')} 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
-                className="auth-input"
-              />
-              <input 
-                type="password" 
-                placeholder={t('password')} 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
-                className="auth-input"
-              />
+              <div className="auth-field">
+                <input 
+                  type="email" 
+                  placeholder={t('emailAddress')} 
+                  value={email} 
+                  onChange={e => { setEmail(e.target.value); setFieldErrors(p => ({...p, email: ''})); }}
+                  className={`auth-input ${fieldErrors.email ? 'input-error' : ''}`}
+                />
+                {fieldErrors.email && <span className="field-error">{fieldErrors.email}</span>}
+              </div>
+              <div className="auth-field">
+                <input 
+                  type="password" 
+                  placeholder={t('password')} 
+                  value={password} 
+                  onChange={e => { setPassword(e.target.value); setFieldErrors(p => ({...p, password: ''})); }}
+                  className={`auth-input ${fieldErrors.password ? 'input-error' : ''}`}
+                />
+                {fieldErrors.password && <span className="field-error">{fieldErrors.password}</span>}
+              </div>
               <button type="submit" className="btn-primary auth-submit" disabled={isSubmitting}>
                 {isSubmitting ? t('signingIn') : t('signIn')}
               </button>

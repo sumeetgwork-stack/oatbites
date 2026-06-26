@@ -1134,8 +1134,28 @@ a {
   border-radius: 12px;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
 }
+
+.field-error {
+  color: #e74c3c;
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+  margin-left: 0.5rem;
+  font-weight: 600;
+  display: block;
+}
+
+.input-error {
+  border-color: #e74c3c !important;
+  background: rgba(231, 76, 60, 0.02) !important;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+}
+
 .auth-link { color: var(--accent-color); font-weight: 700; text-decoration: none; }
 .auth-link:hover { text-decoration: underline; }
 
@@ -1901,6 +1921,40 @@ a {
     right: auto;
     left: 0;
   }
+
+  /* Form & Auth Mobile Optimization */
+  .auth-page {
+    padding: 1rem;
+  }
+  .auth-card {
+    padding: 2rem 1.5rem;
+    width: 100%;
+  }
+  .auth-title {
+    font-size: 1.5rem;
+  }
+  .auth-input, .form-field input, .fk-form-row input, .fk-form-row textarea, .modal-form input, .modal-form select {
+    font-size: 16px !important; /* Prevents iOS auto-zoom */
+    padding: 1rem 1.2rem;
+  }
+  .auth-submit, .google-btn, .checkout-pay-btn {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  .checkout-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .checkout-form, .checkout-summary {
+    padding: 1.5rem;
+  }
+  .checkout-total-row.grand-total {
+    font-size: 1.2rem;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2225,6 +2279,43 @@ a {
     align-items: flex-start;
     gap: 8px;
   }
+  .detail-actions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .detail-actions .qty-controls {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
+  .add-to-cart-large {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  .notify-me-btn {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+  .stock-badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  .fk-address-dropdown-btn {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+  .lang-selector-btn {
+    font-size: 0.9rem;
+  }
+  .stock-overlay-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+    top: 8px;
+    left: 8px;
+  }
 }
 
 /* ==========================================
@@ -2276,51 +2367,6 @@ a {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-}
-
-/* ==========================================
-   MOBILE OPTIMIZATIONS FOR NEW FEATURES
-   ========================================== */
-
-@media (max-width: 768px) {
-  /* Product detail actions stacking */
-  .detail-actions {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
-  
-  .detail-actions .qty-controls {
-    width: 100%;
-    justify-content: space-between;
-    padding: 0 1rem;
-  }
-  
-  .add-to-cart-large {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-  }
-
-  /* Notify me button smaller padding */
-  .notify-me-btn {
-    padding: 12px 16px;
-    font-size: 0.9rem;
-    width: 100%;
-  }
-
-  /* Stock badges text sizing */
-  .stock-badge {
-    font-size: 0.8rem;
-    padding: 6px 12px;
-  }
-
-  .stock-overlay-badge {
-    font-size: 10px;
-    padding: 4px 10px;
-    top: 8px;
-    left: 8px;
-  }
 }
 
 /* PWA Install Prompt */
