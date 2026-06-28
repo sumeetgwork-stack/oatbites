@@ -119,7 +119,11 @@ export default function CheckoutPage() {
   }, [cart, isLoading, isLoggedIn, router, user?.name]);
 
   const handleCOD = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert('Please fill out all shipping details correctly.');
+      return;
+    }
 
     setProcessing(true);
 
@@ -148,7 +152,11 @@ export default function CheckoutPage() {
   };
 
   const handlePayment = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert('Please fill out all shipping details correctly.');
+      return;
+    }
 
     setProcessing(true);
 
