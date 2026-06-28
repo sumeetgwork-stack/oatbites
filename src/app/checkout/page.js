@@ -146,7 +146,7 @@ export default function CheckoutPage() {
       router.push(`/order-confirmation?id=${data.orderId}`);
     } catch (error) {
       console.error('COD failed:', error);
-      alert('Something went wrong. Please try again.');
+      alert('Order failed: ' + (error.message || 'Something went wrong'));
       setProcessing(false);
     }
   };
