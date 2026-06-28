@@ -80,7 +80,7 @@ export async function updateOrderStatus(orderId, status) {
     { $set: update },
     { returnDocument: 'after' }
   );
-  return result;
+  return result?.value || result;
 }
 
 export async function updateOrderPayment(orderId, paymentData) {
@@ -118,7 +118,7 @@ export async function updateOrderPayment(orderId, paymentData) {
     }
   }
 
-  return result;
+  return result?.value || result;
 }
 
 export async function processCodOrder(orderId) {
@@ -151,7 +151,7 @@ export async function processCodOrder(orderId) {
     }
   }
 
-  return result;
+  return result?.value || result;
 }
 
 // Product helpers
