@@ -406,7 +406,7 @@ export default function DashboardPage() {
                     <div className="fk-orders-list">
                       {orders.map(order => (
                         <div key={order.id} style={{ display: 'flex', flexDirection: 'column', border: '1px solid #f0f0f0', marginBottom: '16px', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
-                          <div className="fk-order-card" style={{ borderBottom: expandedOrder === order.id ? 'none' : '1px solid transparent', marginBottom: 0, border: 'none', background: 'transparent' }}>
+                          <div className="fk-order-card" style={{ borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: expandedOrder === order.id ? 'none' : '1px solid transparent', marginBottom: 0, background: 'transparent' }}>
                             <div className="fk-order-images">
                               {order.items.slice(0, 3).map((item, i) => (
                                 <div key={i} className="fk-order-thumb" title={item.name}>
