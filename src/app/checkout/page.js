@@ -78,7 +78,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!isLoading && isLoggedIn) {
-      if (cart.length === 0) {
+      if (cart.length === 0 && !processing) {
         router.push('/products');
         return;
       }
