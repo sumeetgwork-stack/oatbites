@@ -10,6 +10,42 @@ import Link from 'next/link';
 
 const Scene = dynamic(() => import('../../components/Scene'), { ssr: false });
 
+function OrderTimeline({ order }) {
+  const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+  
+  let currentIndex = 0;
+  if (order.status === 'Processing') currentIndex = 1;
+  if (order.status === 'Shipped') currentIndex = 2;
+  if (order.status === 'Delivered') currentIndex = 3;
+  if (order.status.includes('COD')) currentIndex = 0;
+
+  return (
+    <div className="order-timeline-container" style={{ padding: '32px 24px', background: '#fafafa', borderTop: '1px solid #f0f0f0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', maxWidth: '500px', margin: '0 auto' }}>
+        <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '2px', background: '#e0e0e0', zIndex: 1 }}></div>
+        <div style={{ position: 'absolute', top: '12px', left: '0', width: `${(currentIndex / 3) * 100}%`, height: '2px', background: '#26a541', zIndex: 1, transition: 'width 0.4s ease' }}></div>
+        
+        {statuses.map((status, index) => (
+          <div key={status} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2 }}>
+            <div style={{ 
+              width: '24px', height: '24px', borderRadius: '50%', 
+              background: index <= currentIndex ? '#26a541' : '#e0e0e0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white', fontSize: '12px', fontWeight: 'bold',
+              boxShadow: index <= currentIndex ? '0 0 0 4px rgba(38, 165, 65, 0.2)' : 'none'
+            }}>
+              {index <= currentIndex ? '✓' : ''}
+            </div>
+            <span style={{ marginTop: '8px', fontSize: '12px', fontWeight: index <= currentIndex ? '600' : '400', color: index <= currentIndex ? '#212121' : '#878787' }}>
+              {status}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { user, isLoggedIn, isLoading } = useAuth();
   const { t } = useLanguage();
@@ -17,6 +53,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   // Layout state
   const [activeTab, setActiveTab] = useState('profile');
@@ -368,24 +405,35 @@ export default function DashboardPage() {
                   ) : (
                     <div className="fk-orders-list">
                       {orders.map(order => (
-                        <div key={order.id} className="fk-order-card">
-                          <div className="fk-order-images">
-                            {order.items.slice(0, 3).map((item, i) => (
-                              <div key={i} className="fk-order-thumb" title={item.name}>
-                                {item.image ? <img src={item.image} alt={item.name} /> : <span>📦</span>}
-                              </div>
-                            ))}
-                            {order.items.length > 3 && <div className="fk-order-thumb-more">+{order.items.length - 3}</div>}
+                        <div key={order.id} style={{ display: 'flex', flexDirection: 'column', border: '1px solid #f0f0f0', marginBottom: '16px', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
+                          <div className="fk-order-card" style={{ borderBottom: expandedOrder === order.id ? 'none' : '1px solid transparent', marginBottom: 0, border: 'none', background: 'transparent' }}>
+                            <div className="fk-order-images">
+                              {order.items.slice(0, 3).map((item, i) => (
+                                <div key={i} className="fk-order-thumb" title={item.name}>
+                                  {item.image ? <img src={item.image} alt={item.name} /> : <span>📦</span>}
+                                </div>
+                              ))}
+                              {order.items.length > 3 && <div className="fk-order-thumb-more">+{order.items.length - 3}</div>}
+                            </div>
+                            <div className="fk-order-details">
+                              <p className="fk-order-title">{order.items.map(i => i.name).join(', ')}</p>
+                              <p className="fk-order-date">{t('orderedOn')} {new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+                            </div>
+                            <div className="fk-order-price">₹{order.total?.toLocaleString('en-IN')}</div>
+                            <div className="fk-order-status">
+                              <span className={`fk-status-dot ${order.status.toLowerCase().replace(/[^a-z]/g, '')}`}></span>
+                              {order.status}
+                            </div>
+                            <div className="fk-order-action">
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); setExpandedOrder(expandedOrder === order.id ? null : order.id); }}
+                                style={{ background: 'transparent', border: '1px solid #2874f0', color: '#2874f0', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', width: '100%' }}
+                              >
+                                {expandedOrder === order.id ? 'Close Track' : 'Track Your Order'}
+                              </button>
+                            </div>
                           </div>
-                          <div className="fk-order-details">
-                            <p className="fk-order-title">{order.items.map(i => i.name).join(', ')}</p>
-                            <p className="fk-order-date">{t('orderedOn')} {new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
-                          </div>
-                          <div className="fk-order-price">₹{order.total?.toLocaleString('en-IN')}</div>
-                          <div className="fk-order-status">
-                            <span className={`fk-status-dot ${order.status.toLowerCase()}`}></span>
-                            {order.status}
-                          </div>
+                          {expandedOrder === order.id && <OrderTimeline order={order} />}
                         </div>
                       ))}
                     </div>

@@ -1716,7 +1716,7 @@ a {
 .fk-orders-list { display: flex; flex-direction: column; }
 .fk-order-card {
   display: grid;
-  grid-template-columns: 100px 1fr 100px 150px;
+  grid-template-columns: 100px 1fr 100px 150px 120px;
   gap: 24px;
   align-items: center;
   padding: 24px;
