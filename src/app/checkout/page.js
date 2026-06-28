@@ -16,6 +16,7 @@ export default function CheckoutPage() {
   const { t } = useLanguage();
   const router = useRouter();
   const SHIPPING_COST = 30;
+  const COD_HANDLING_FEE = 10;
   const [address, setAddress] = useState({
     fullName: '',
     phone: '',
@@ -128,7 +129,7 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: cart.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
-          total: cartTotal + SHIPPING_COST,
+          total: cartTotal + SHIPPING_COST + COD_HANDLING_FEE,
           shippingAddress: address,
           paymentMethod: 'COD',
         }),
@@ -368,12 +369,12 @@ export default function CheckoutPage() {
                   <span>{t('total')}</span>
                   <span>₹{(cartTotal + SHIPPING_COST).toLocaleString('en-IN')}</span>
                 </div>
-                <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexDirection: 'column' }}>
                   <button 
                     className="btn-primary checkout-pay-btn"
                     onClick={handlePayment}
                     disabled={processing}
-                    style={{ flex: 1, margin: 0 }}
+                    style={{ margin: 0 }}
                   >
                     {processing ? 'Processing...' : `Pay Online ₹${(cartTotal + SHIPPING_COST).toLocaleString('en-IN')}`}
                   </button>
@@ -381,10 +382,13 @@ export default function CheckoutPage() {
                     className="btn-secondary checkout-pay-btn"
                     onClick={handleCOD}
                     disabled={processing}
-                    style={{ flex: 1, background: '#f8f9fa', color: '#2c1810', border: '1px solid #dcdde1', margin: 0 }}
+                    style={{ background: '#f8f9fa', color: '#2c1810', border: '1px solid #dcdde1', margin: 0 }}
                   >
-                    {processing ? 'Processing...' : 'Cash on Delivery'}
+                    {processing ? 'Processing...' : `Cash on Delivery ₹${(cartTotal + SHIPPING_COST + COD_HANDLING_FEE).toLocaleString('en-IN')}`}
                   </button>
+                  <p style={{ textAlign: 'center', fontSize: '0.78rem', color: '#888', margin: '0' }}>
+                    COD includes ₹{COD_HANDLING_FEE} handling fee
+                  </p>
                 </div>
               </div>
             </div>

@@ -105,12 +105,16 @@ export async function sendOrderConfirmationEmail(order) {
       <tfoot>
         <tr>
           <td colspan="2" style="padding: 16px 16px 8px; text-align: right; color: #555;">Subtotal:</td>
-          <td style="padding: 16px 16px 8px; text-align: right; color: #555;">₹${(order.total - 30)?.toLocaleString('en-IN')}</td>
+          <td style="padding: 16px 16px 8px; text-align: right; color: #555;">₹${((order.items || []).reduce((s, i) => s + i.price * i.quantity, 0)).toLocaleString('en-IN')}</td>
         </tr>
         <tr>
-          <td colspan="2" style="padding: 8px 16px 16px; text-align: right; color: #555;">Shipping:</td>
-          <td style="padding: 8px 16px 16px; text-align: right; color: #555;">₹30</td>
+          <td colspan="2" style="padding: 8px 16px; text-align: right; color: #555;">Shipping:</td>
+          <td style="padding: 8px 16px; text-align: right; color: #555;">₹30</td>
         </tr>
+        ${order.paymentMethod === 'COD' ? `<tr>
+          <td colspan="2" style="padding: 8px 16px; text-align: right; color: #555;">COD Handling Fee:</td>
+          <td style="padding: 8px 16px; text-align: right; color: #555;">₹10</td>
+        </tr>` : ''}
         <tr>
           <td colspan="2" style="padding: 16px; text-align: right; font-weight: 600; color: #2c1810; border-top: 2px solid #f0f0f0;">Total:</td>
           <td style="padding: 16px; text-align: right; font-weight: 800; font-size: 18px; color: #2c1810; border-top: 2px solid #f0f0f0;">₹${order.total?.toLocaleString('en-IN')}</td>
